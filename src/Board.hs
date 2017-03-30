@@ -99,9 +99,9 @@ getPositionColor board pos = sel2 (head[x | x <- pieces board, sel1 x == pos])
 -- Returns 'Nothing' if neither player has won yet
 -- Returns 'Just c' if the player 'c' has won
 checkWon :: Board -> Maybe Col
-checkWon board |checkRows board (sel1 (head (pieces board))) == True = Just (getPositionColor board (sel1 (head (pieces board))))
-	       |checkColumns board (sel1 (head (pieces board))) == True = Just (getPositionColor board (sel1 (head (pieces board))))
-	       |checkDiagonals board (sel1 (head (pieces board))) == True = Just (getPositionColor board (sel1 (head (pieces board))))
+checkWon board |checkRows board (sel1 ((pieces board) !! 0)) == True = Just (getPositionColor board (sel1 ((pieces board)!! 0)))
+	    --   |checkColumns board (sel1 (head (pieces board))) == True = Just (getPositionColor board (sel1 (head (pieces board))))
+	    --   |checkDiagonals board (sel1 (head (pieces board))) == True = Just (getPositionColor board (sel1 (head (pieces board))))
 	       |otherwise = Nothing
 
 checkRows :: Board -> Position -> Bool

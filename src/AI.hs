@@ -2,6 +2,9 @@ module AI where
 
 import Board
 
+import Debug.Trace
+import Data.Maybe
+
 data GameTree = GameTree { game_board :: Board,
                            game_turn :: Col,
                            next_moves :: [(Position, GameTree)] }
@@ -46,7 +49,9 @@ getBestMove = undefined
 updateWorld :: Float -- ^ time since last update (you can ignore this)
             -> World -- ^ current world state
             -> World
-updateWorld t world = world
+updateWorld t world |length (pieces (board world)) > 0 = trace ("Black has Won!") world {-&& checkWon (board world) == Just Black = trace ("Black has Won!") world
+		    |length (pieces (board world)) > 0 && checkWon (board world) == Just White = trace ("White has Won!") world-}
+		    |otherwise = world
 
 {- Hint: 'updateWorld' is where the AI gets called. If the world state
  indicates that it is a computer player's turn, updateWorld should use
