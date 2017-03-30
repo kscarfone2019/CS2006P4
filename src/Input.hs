@@ -17,52 +17,48 @@ import Data.Maybe
 handleInput :: Event -> World -> World
 handleInput (EventMotion (x, y)) world = trace ("Mouse moved to: " ++ show (x,y)) world
 
+handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,1))) (other (turn world)))
+								  |x<(-212.5) && x>(-287.5) && y>112.5 && y< 187.5 && (makeMove (board world) (turn world) (1,2)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,2))) (other (turn world)))
+								  |x<(-212.5) && x>(-287.5) && y>12.5 && y< 87.5 && (makeMove (board world) (turn world) (1,3)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,3))) (other (turn world)))
+								  |x<(-212.5) && x>(-287.5) && y>(-87.5) && y< (-12.5) && (makeMove (board world) (turn world) (1,4)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,4))) (other (turn world)))
+								  |x<(-212.5) && x>(-287.5) && y>(-187.5) && y< (-112.5) && (makeMove (board world) (turn world) (1,5)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,5))) (other (turn world)))
+								  |x<(-212.5) && x>(-287.5) && y>(-287.5) && y< (-212.5) && (makeMove (board world) (turn world) (1,6)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,6))) (other (turn world)))
 
-handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,1))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,2))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,3))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,4))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,5))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,6))) (turn world))
+								  |x<(-112.5) && x>(-187.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (2,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,1))) (other (turn world)))
+								  |x<(-112.5) && x>(-187.5) && y>112.5 && y< 187.5 && (makeMove (board world) (turn world) (2,2)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,2))) (other (turn world)))
+								  |x<(-112.5) && x>(-187.5) && y>12.5 && y< 87.5 && (makeMove (board world) (turn world) (2,3)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,3))) (other (turn world)))
+								  |x<(-112.5) && x>(-187.5) && y>(-87.5) && y< (-12.5) && (makeMove (board world) (turn world) (2,4)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,4))) (other (turn world)))
+								  |x<(-112.5) && x>(-187.5) && y>(-187.5) && y< (-112.5) && (makeMove (board world) (turn world) (2,5)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,5))) (other (turn world)))
+								  |x<(-112.5) && x>(-187.5) && y>(-287.5) && y< (-212.5) && (makeMove (board world) (turn world) (2,6)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,6))) (other (turn world)))
 
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,1))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,2))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,3))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,4))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,5))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (2,6))) (turn world))
+								  |x<(-12.5) && x>(-87.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (3,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,1))) (other (turn world)))
+								  |x<(-12.5) && x>(-87.5) && y>112.5 && y< 187.5 && (makeMove (board world) (turn world) (3,2)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,2))) (other (turn world)))
+								  |x<(-12.5) && x>(-87.5) && y>12.5 && y< 87.5 && (makeMove (board world) (turn world) (3,3)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,3))) (other (turn world)))
+								  |x<(-12.5) && x>(-87.5) && y>(-87.5) && y< (-12.5) && (makeMove (board world) (turn world) (3,4)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,4))) (other (turn world)))
+								  |x<(-12.5) && x>(-87.5) && y>(-187.5) && y< (-112.5) && (makeMove (board world) (turn world) (3,5)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,5))) (other (turn world)))
+								  |x<(-12.5) && x>(-87.5) && y>(-287.5) && y< (-212.5) && (makeMove (board world) (turn world) (3,6)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,6))) (other (turn world)))
 
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,1))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,2))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,3))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,4))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,5))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (3,6))) (turn world))
+								  |x<87.5 && x>12.5 && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (4,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,1))) (other (turn world)))
+								  |x<87.5 && x>12.5 && y>112.5 && y< 187.5 && (makeMove (board world) (turn world) (4,2)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,2))) (other (turn world)))
+								  |x<87.5 && x>12.5 && y>12.5 && y< 87.5 && (makeMove (board world) (turn world) (4,3)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,3))) (other (turn world)))
+								  |x<87.5 && x>12.5 && y>(-87.5) && y< (-12.5) && (makeMove (board world) (turn world) (4,4)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,4))) (other (turn world)))
+								  |x<87.5 && x>12.5 && y>(-187.5) && y< (-112.5) && (makeMove (board world) (turn world) (4,5)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,5))) (other (turn world)))
+								  |x<87.5 && x>12.5 && y>(-287.5) && y< (-212.5) && (makeMove (board world) (turn world) (4,6)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,6))) (other (turn world)))
 
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,1))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,2))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,3))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,4))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,5))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (4,6))) (turn world))
+								  |x<187.5 && x>112.5 && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (5,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,1))) (other (turn world)))
+								  |x<187.5 && x>112.5 && y>112.5 && y< 187.5 && (makeMove (board world) (turn world) (5,2)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,2))) (other (turn world)))
+								  |x<187.5 && x>112.5 && y>12.5 && y< 87.5 && (makeMove (board world) (turn world) (5,3)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,3))) (other (turn world)))
+								  |x<187.5 && x>112.5 && y>(-87.5) && y< (-12.5) && (makeMove (board world) (turn world) (5,4)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,4))) (other (turn world)))
+								  |x<187.5 && x>112.5 && y>(-187.5) && y< (-112.5) && (makeMove (board world) (turn world) (5,5)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,5))) (other (turn world)))
+								  |x<187.5 && x>112.5 && y>(-287.5) && y< (-212.5) && (makeMove (board world) (turn world) (5,6)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,6))) (other (turn world)))
 
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,1))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,2))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,3))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,4))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,5))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (5,6))) (turn world))
-
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,1))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,2))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,3))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,4))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,5))) (turn world))
-								  |x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,6))) (turn world))
+								  |x<287.5 && x>212.5 && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (6,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,1))) (other (turn world)))
+								  |x<287.5 && x>212.5 && y>112.5 && y< 187.5 && (makeMove (board world) (turn world) (6,2)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,2))) (other (turn world)))
+								  |x<287.5 && x>212.5 && y>12.5 && y< 87.5 && (makeMove (board world) (turn world) (6,3)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,3))) (other (turn world)))
+								  |x<287.5 && x>212.5 && y>(-87.5) && y< (-12.5) && (makeMove (board world) (turn world) (6,4)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,4))) (other (turn world)))
+								  |x<287.5 && x>212.5 && y>(-187.5) && y< (-112.5) && (makeMove (board world) (turn world) (6,5)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,5))) (other (turn world)))
+								  |x<287.5 && x>212.5 && y>(-287.5) && y< (-212.5) && (makeMove (board world) (turn world) (6,6)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (6,6))) (other (turn world)))
 								  |otherwise = world
---handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world = trace ("Left button pressed at: " ++ show (x,y)) world
-
-
 
 
 handleInput (EventKey (Char k) Down _ _) world = trace ("Key " ++ show k ++ " down") world
