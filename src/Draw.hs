@@ -5,14 +5,7 @@ import Board
 import Data.Tuple.Select
 
 -- Given a world state, return a Picture which will render the world state.
--- Currently just draws a single blue circle as a placeholder.
---
--- This will need to extract the Board from the world state and draw it
--- as a grid plus pieces.
 drawWorld :: World -> Picture
-
---Color black (Translate 50 (-250) (circleSolid 40)),
---Color white (Translate 50 (-250) (circleSolid 40)),
 
 drawWorld w = Pictures [
 		--column 1
@@ -21,7 +14,7 @@ drawWorld w = Pictures [
 		printPositionOneThree (board w),
 		printPositionOneFour (board w),
 		printPositionOneFive (board w),
-		printPositionOneSix(board w),
+		printPositionOneSix (board w),
 
 		--column 2
 		printPositionTwoOne (board w),
@@ -29,7 +22,7 @@ drawWorld w = Pictures [
 		printPositionTwoThree (board w),
 		printPositionTwoFour (board w),
 		printPositionTwoFive (board w),
-		printPositionTwoSix(board w),
+		printPositionTwoSix (board w),
 		
 		--column 3
 		printPositionThreeOne (board w),
@@ -37,7 +30,7 @@ drawWorld w = Pictures [
 		printPositionThreeThree (board w),
 		printPositionThreeFour (board w),
 		printPositionThreeFive (board w),
-		printPositionThreeSix(board w),
+		printPositionThreeSix (board w),
 
 		--column 4
 		printPositionFourOne (board w),
@@ -45,7 +38,7 @@ drawWorld w = Pictures [
 		printPositionFourThree (board w),
 		printPositionFourFour (board w),
 		printPositionFourFive (board w),
-		printPositionFourSix(board w),
+		printPositionFourSix (board w),
 
 		--column 5
 		printPositionFiveOne (board w),
@@ -53,7 +46,7 @@ drawWorld w = Pictures [
 		printPositionFiveThree (board w),
 		printPositionFiveFour (board w),
 		printPositionFiveFive (board w),
-		printPositionFiveSix(board w),
+		printPositionFiveSix (board w),
 
 		--column 6
 		printPositionSixOne (board w),
@@ -61,7 +54,7 @@ drawWorld w = Pictures [
 		printPositionSixThree (board w),
 		printPositionSixFour (board w),
 		printPositionSixFive (board w),
-		printPositionSixSix(board w)
+		printPositionSixSix (board w)
                 ]
 
 --column 1
@@ -79,33 +72,33 @@ printPositionOneOne board |pieceHere (1,1) board == True && getColour (1,1) boar
 printPositionOneTwo :: Board -> Picture
 printPositionOneTwo board |pieceHere (1,2) board == True && getColour (1,2) board == Black = Pictures[
 											Color blue (Translate (-250) 150 (rectangleSolid 75 75)),
-											Color black (Translate (-250) 250 (circleSolid 35))
+											Color black (Translate (-250) 150 (circleSolid 35))
 											]
 		       |pieceHere (1,2) board == True && getColour (1,2) board == White = Pictures[
 											Color blue (Translate (-250) 150 (rectangleSolid 75 75)),
-											Color white (Translate (-250) 250 (circleSolid 35))
+											Color white (Translate (-250) 150 (circleSolid 35))
 											]
 		       |otherwise = Color blue (Translate (-250) 150 (rectangleSolid 75 75))
 
 printPositionOneThree :: Board -> Picture
 printPositionOneThree board |pieceHere (1,3) board == True && getColour (1,3) board == Black = Pictures[
 											Color blue (Translate (-250) 50 (rectangleSolid 75 75)),
-											Color black (Translate (-250) 250 (circleSolid 35))
+											Color black (Translate (-250) 50 (circleSolid 35))
 											]
 		       |pieceHere (1,3) board == True && getColour (1,3) board == White = Pictures[
 											Color blue (Translate (-250) 50 (rectangleSolid 75 75)),
-											Color white (Translate (-250) 250 (circleSolid 35))
+											Color white (Translate (-250) 50 (circleSolid 35))
 											]
 		       |otherwise = Color blue (Translate (-250) 50 (rectangleSolid 75 75))
 
 printPositionOneFour :: Board -> Picture
 printPositionOneFour board |pieceHere (1,4) board == True && getColour (1,4) board == Black = Pictures[
 											Color blue (Translate (-250) (-50) (rectangleSolid 75 75)),
-											Color black (Translate (-250) 250 (circleSolid 35))
+											Color black (Translate (-250) (-50) (circleSolid 35))
 											]
 		       |pieceHere (1,4) board == True && getColour (1,4) board == White = Pictures[
 											Color blue (Translate (-250) (-50) (rectangleSolid 75 75)),
-											Color white (Translate (-250) 250 (circleSolid 35))
+											Color white (Translate (-250) (-50) (circleSolid 35))
 											]
 		       |otherwise = Color blue (Translate (-250) (-50) (rectangleSolid 75 75))
 
