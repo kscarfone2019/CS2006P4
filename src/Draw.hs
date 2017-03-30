@@ -17,51 +17,51 @@ drawWorld :: World -> Picture
 drawWorld w = Pictures [
 		--column 1
 		printPositionOneOne (board w),
-		printPositionTwoOne (board w),
-		printPositionThreeOne (board w),
-		printPositionFourOne (board w),
-		printPositionFiveOne (board w),
-		printPositionSixOne(board w),
+		printPositionOneTwo (board w),
+		printPositionOneThree (board w),
+		printPositionOneFour (board w),
+		printPositionOneFive (board w),
+		printPositionOneSix(board w),
 
 		--column 2
-		printPositionOneTwo (board w),
+		printPositionTwoOne (board w),
 		printPositionTwoTwo (board w),
-		printPositionThreeTwo (board w),
-		printPositionFourTwo (board w),
-		printPositionFiveTwo (board w),
-		printPositionSixTwo (board w),
+		printPositionTwoThree (board w),
+		printPositionTwoFour (board w),
+		printPositionTwoFive (board w),
+		printPositionTwoSix(board w),
 		
 		--column 3
-		printPositionOneThree (board w),
-		printPositionTwoThree (board w),
+		printPositionThreeOne (board w),
+		printPositionThreeTwo (board w),
 		printPositionThreeThree (board w),
-		printPositionFourThree (board w),
-		printPositionFiveThree (board w),
-		printPositionSixThree (board w),
+		printPositionThreeFour (board w),
+		printPositionThreeFive (board w),
+		printPositionThreeSix(board w),
 
 		--column 4
-		Color yellow (Translate 50 250 (rectangleSolid 75 75)),
-		Color yellow (Translate 50 150 (rectangleSolid 75 75)),
-		Color yellow (Translate 50 50 (rectangleSolid 75 75)),
-		Color yellow (Translate 50 (-50) (rectangleSolid 75 75)),
-		Color yellow (Translate 50 (-150) (rectangleSolid 75 75)),
-		Color yellow (Translate 50 (-250) (rectangleSolid 75 75)),
+		printPositionFourOne (board w),
+		printPositionFourTwo (board w),
+		printPositionFourThree (board w),
+		printPositionFourFour (board w),
+		printPositionFourFive (board w),
+		printPositionFourSix(board w),
 
 		--column 5
-		Color yellow (Translate 150 250 (rectangleSolid 75 75)),
-		Color yellow (Translate 150 150 (rectangleSolid 75 75)),
-		Color yellow (Translate 150 50 (rectangleSolid 75 75)),
-		Color yellow (Translate 150 (-50) (rectangleSolid 75 75)),
-		Color yellow (Translate 150 (-150) (rectangleSolid 75 75)),
-		Color yellow (Translate 150 (-250) (rectangleSolid 75 75)),
+		printPositionFiveOne (board w),
+		printPositionFiveTwo (board w),
+		printPositionFiveThree (board w),
+		printPositionFiveFour (board w),
+		printPositionFiveFive (board w),
+		printPositionFiveSix(board w),
 
 		--column 6
-		Color yellow (Translate 250 250 (rectangleSolid 75 75)),
-		Color yellow (Translate 250 150 (rectangleSolid 75 75)),
-		Color yellow (Translate 250 50 (rectangleSolid 75 75)),
-		Color yellow (Translate 250 (-50) (rectangleSolid 75 75)),
-		Color yellow (Translate 250 (-150) (rectangleSolid 75 75)),
-		Color yellow (Translate 250 (-250) (rectangleSolid 75 75))
+		printPositionSixOne (board w),
+		printPositionSixTwo (board w),
+		printPositionSixThree (board w),
+		printPositionSixFour (board w),
+		printPositionSixFive (board w),
+		printPositionSixSix(board w)
                 ]
 
 --column 1
@@ -76,8 +76,8 @@ printPositionOneOne board |pieceHere (1,1) board == True && getColour (1,1) boar
 											]
 		       |otherwise = Color blue (Translate (-250) 250 (rectangleSolid 75 75))
 
-printPositionTwoOne :: Board -> Picture
-printPositionTwoOne board |pieceHere (1,2) board == True && getColour (1,2) board == Black = Pictures[
+printPositionOneTwo :: Board -> Picture
+printPositionOneTwo board |pieceHere (1,2) board == True && getColour (1,2) board == Black = Pictures[
 											Color blue (Translate (-250) 150 (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -87,8 +87,8 @@ printPositionTwoOne board |pieceHere (1,2) board == True && getColour (1,2) boar
 											]
 		       |otherwise = Color blue (Translate (-250) 150 (rectangleSolid 75 75))
 
-printPositionThreeOne :: Board -> Picture
-printPositionThreeOne board |pieceHere (1,3) board == True && getColour (1,3) board == Black = Pictures[
+printPositionOneThree :: Board -> Picture
+printPositionOneThree board |pieceHere (1,3) board == True && getColour (1,3) board == Black = Pictures[
 											Color blue (Translate (-250) 50 (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -98,8 +98,8 @@ printPositionThreeOne board |pieceHere (1,3) board == True && getColour (1,3) bo
 											]
 		       |otherwise = Color blue (Translate (-250) 50 (rectangleSolid 75 75))
 
-printPositionFourOne :: Board -> Picture
-printPositionFourOne board |pieceHere (1,4) board == True && getColour (1,4) board == Black = Pictures[
+printPositionOneFour :: Board -> Picture
+printPositionOneFour board |pieceHere (1,4) board == True && getColour (1,4) board == Black = Pictures[
 											Color blue (Translate (-250) (-50) (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -109,8 +109,8 @@ printPositionFourOne board |pieceHere (1,4) board == True && getColour (1,4) boa
 											]
 		       |otherwise = Color blue (Translate (-250) (-50) (rectangleSolid 75 75))
 
-printPositionFiveOne :: Board -> Picture
-printPositionFiveOne board |pieceHere (1,5) board == True && getColour (1,5) board == Black = Pictures[
+printPositionOneFive :: Board -> Picture
+printPositionOneFive board |pieceHere (1,5) board == True && getColour (1,5) board == Black = Pictures[
 											Color blue (Translate (-250) (-150) (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -120,8 +120,8 @@ printPositionFiveOne board |pieceHere (1,5) board == True && getColour (1,5) boa
 											]
 		       |otherwise = Color blue (Translate (-250) (-150) (rectangleSolid 75 75))
 
-printPositionSixOne :: Board -> Picture
-printPositionSixOne board |pieceHere (1,6) board == True && getColour (1,6) board == Black = Pictures[
+printPositionOneSix :: Board -> Picture
+printPositionOneSix board |pieceHere (1,6) board == True && getColour (1,6) board == Black = Pictures[
 											Color blue (Translate (-250) (-250) (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -133,8 +133,8 @@ printPositionSixOne board |pieceHere (1,6) board == True && getColour (1,6) boar
 
 --column 2
 
-printPositionOneTwo :: Board -> Picture
-printPositionOneTwo board |pieceHere (2,1) board == True && getColour (2,1) board == Black = Pictures[
+printPositionTwoOne :: Board -> Picture
+printPositionTwoOne board |pieceHere (2,1) board == True && getColour (2,1) board == Black = Pictures[
 											Color blue (Translate (-150) 250 (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -155,8 +155,8 @@ printPositionTwoTwo board |pieceHere (2,2) board == True && getColour (2,2) boar
 											]
 		       |otherwise = Color blue (Translate (-150) 150 (rectangleSolid 75 75))
 
-printPositionThreeTwo :: Board -> Picture
-printPositionThreeTwo board |pieceHere (2,3) board == True && getColour (2,3) board == Black = Pictures[
+printPositionTwoThree :: Board -> Picture
+printPositionTwoThree board |pieceHere (2,3) board == True && getColour (2,3) board == Black = Pictures[
 											Color blue (Translate (-150) 50 (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -166,8 +166,8 @@ printPositionThreeTwo board |pieceHere (2,3) board == True && getColour (2,3) bo
 											]
 		       |otherwise = Color blue (Translate (-150) 50 (rectangleSolid 75 75))
 
-printPositionFourTwo :: Board -> Picture
-printPositionFourTwo board |pieceHere (2,4) board == True && getColour (2,4) board == Black = Pictures[
+printPositionTwoFour :: Board -> Picture
+printPositionTwoFour board |pieceHere (2,4) board == True && getColour (2,4) board == Black = Pictures[
 											Color blue (Translate (-150) (-50) (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -177,8 +177,8 @@ printPositionFourTwo board |pieceHere (2,4) board == True && getColour (2,4) boa
 											]
 		       |otherwise = Color blue (Translate (-150) (-50) (rectangleSolid 75 75))
 
-printPositionFiveTwo :: Board -> Picture
-printPositionFiveTwo board |pieceHere (2,5) board == True && getColour (2,5) board == Black = Pictures[
+printPositionTwoFive :: Board -> Picture
+printPositionTwoFive board |pieceHere (2,5) board == True && getColour (2,5) board == Black = Pictures[
 											Color blue (Translate (-150) (-150) (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -188,8 +188,8 @@ printPositionFiveTwo board |pieceHere (2,5) board == True && getColour (2,5) boa
 											]
 		       |otherwise = Color blue (Translate (-150) (-150) (rectangleSolid 75 75))
 
-printPositionSixTwo :: Board -> Picture
-printPositionSixTwo board |pieceHere (2,6) board == True && getColour (2,6) board == Black = Pictures[
+printPositionTwoSix :: Board -> Picture
+printPositionTwoSix board |pieceHere (2,6) board == True && getColour (2,6) board == Black = Pictures[
 											Color blue (Translate (-150) (-250) (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -198,18 +198,12 @@ printPositionSixTwo board |pieceHere (2,6) board == True && getColour (2,6) boar
 											Color white (Translate (-250) 250 (circleSolid 35))
 											]
 		       |otherwise = Color blue (Translate (-150) (-250) (rectangleSolid 75 75))
-
-		
-
 	
-
-		
-		
 
 --column 3
 
-printPositionOneThree :: Board -> Picture
-printPositionOneThree board |pieceHere (3,1) board == True && getColour (3,1) board == Black = Pictures[
+printPositionThreeOne :: Board -> Picture
+printPositionThreeOne board |pieceHere (3,1) board == True && getColour (3,1) board == Black = Pictures[
 											Color blue (Translate (-50) 250 (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -219,8 +213,8 @@ printPositionOneThree board |pieceHere (3,1) board == True && getColour (3,1) bo
 											]
 		       |otherwise = Color blue (Translate (-50) 250 (rectangleSolid 75 75))
 
-printPositionTwoThree :: Board -> Picture
-printPositionTwoThree board |pieceHere (3,2) board == True && getColour (3,2) board == Black = Pictures[
+printPositionThreeTwo :: Board -> Picture
+printPositionThreeTwo board |pieceHere (3,2) board == True && getColour (3,2) board == Black = Pictures[
 											Color blue (Translate (-50) 150 (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -241,8 +235,8 @@ printPositionThreeThree board |pieceHere (3,3) board == True && getColour (3,3) 
 											]
 		       |otherwise = Color blue (Translate (-50) 50 (rectangleSolid 75 75))
 
-printPositionFourThree :: Board -> Picture
-printPositionFourThree board |pieceHere (3,4) board == True && getColour (3,4) board == Black = Pictures[
+printPositionThreeFour :: Board -> Picture
+printPositionThreeFour board |pieceHere (3,4) board == True && getColour (3,4) board == Black = Pictures[
 											Color blue (Translate (-50) (-50) (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -252,8 +246,8 @@ printPositionFourThree board |pieceHere (3,4) board == True && getColour (3,4) b
 											]
 		       |otherwise = Color blue (Translate (-50) (-50) (rectangleSolid 75 75))
 
-printPositionFiveThree :: Board -> Picture
-printPositionFiveThree board |pieceHere (3,5) board == True && getColour (3,5) board == Black = Pictures[
+printPositionThreeFive :: Board -> Picture
+printPositionThreeFive board |pieceHere (3,5) board == True && getColour (3,5) board == Black = Pictures[
 											Color blue (Translate (-50) (-150) (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -263,8 +257,8 @@ printPositionFiveThree board |pieceHere (3,5) board == True && getColour (3,5) b
 											]
 		       |otherwise = Color blue (Translate (-50) (-150) (rectangleSolid 75 75))
 
-printPositionSixThree :: Board -> Picture
-printPositionSixThree board |pieceHere (3,6) board == True && getColour (3,6) board == Black = Pictures[
+printPositionThreeSix :: Board -> Picture
+printPositionThreeSix board |pieceHere (3,6) board == True && getColour (3,6) board == Black = Pictures[
 											Color blue (Translate (-50) (-250) (rectangleSolid 75 75)),
 											Color black (Translate (-250) 250 (circleSolid 35))
 											]
@@ -273,6 +267,215 @@ printPositionSixThree board |pieceHere (3,6) board == True && getColour (3,6) bo
 											Color white (Translate (-250) 250 (circleSolid 35))
 											]
 		       |otherwise = Color blue (Translate (-50) (-250) (rectangleSolid 75 75))
+
+
+--column 4
+
+printPositionFourOne :: Board -> Picture
+printPositionFourOne board |pieceHere (4,1) board == True && getColour (4,1) board == Black = Pictures[
+											Color blue (Translate 50 250 (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (4,1) board == True && getColour (4,1) board == White = Pictures[
+											Color blue (Translate 50 250 (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 50 250 (rectangleSolid 75 75))
+
+printPositionFourTwo :: Board -> Picture
+printPositionFourTwo board |pieceHere (4,2) board == True && getColour (4,2) board == Black = Pictures[
+											Color blue (Translate 50 150 (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (4,2) board == True && getColour (4,2) board == White = Pictures[
+											Color blue (Translate 50 150 (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 50 150 (rectangleSolid 75 75))
+
+printPositionFourThree :: Board -> Picture
+printPositionFourThree board |pieceHere (4,3) board == True && getColour (4,3) board == Black = Pictures[
+											Color blue (Translate 50 50 (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (4,3) board == True && getColour (4,3) board == White = Pictures[
+											Color blue (Translate 50 50 (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 50 50 (rectangleSolid 75 75))
+
+printPositionFourFour :: Board -> Picture
+printPositionFourFour board |pieceHere (4,4) board == True && getColour (4,4) board == Black = Pictures[
+											Color blue (Translate 50 (-50) (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (4,4) board == True && getColour (4,4) board == White = Pictures[
+											Color blue (Translate 50 (-50) (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 50 (-50) (rectangleSolid 75 75))
+
+printPositionFourFive :: Board -> Picture
+printPositionFourFive board |pieceHere (4,5) board == True && getColour (4,5) board == Black = Pictures[
+											Color blue (Translate 50 (-150) (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (4,5) board == True && getColour (4,5) board == White = Pictures[
+											Color blue (Translate 50 (-150) (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 50 (-150) (rectangleSolid 75 75))
+
+printPositionFourSix :: Board -> Picture
+printPositionFourSix board |pieceHere (4,6) board == True && getColour (4,6) board == Black = Pictures[
+											Color blue (Translate 50 (-250) (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (4,6) board == True && getColour (4,6) board == White = Pictures[
+											Color blue (Translate 50 (-250) (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 50 (-250) (rectangleSolid 75 75))
+
+
+--column 5
+
+printPositionFiveOne :: Board -> Picture
+printPositionFiveOne board |pieceHere (5,1) board == True && getColour (5,1) board == Black = Pictures[
+											Color blue (Translate 150 250 (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (5,1) board == True && getColour (5,1) board == White = Pictures[
+											Color blue (Translate 150 250 (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 150 250 (rectangleSolid 75 75))
+
+printPositionFiveTwo :: Board -> Picture
+printPositionFiveTwo board |pieceHere (5,2) board == True && getColour (5,2) board == Black = Pictures[
+											Color blue (Translate 150 150 (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (5,2) board == True && getColour (5,2) board == White = Pictures[
+											Color blue (Translate 150 150 (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 150 150 (rectangleSolid 75 75))
+
+printPositionFiveThree :: Board -> Picture
+printPositionFiveThree board |pieceHere (5,3) board == True && getColour (5,3) board == Black = Pictures[
+											Color blue (Translate 150 50 (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (5,3) board == True && getColour (5,3) board == White = Pictures[
+											Color blue (Translate 150 50 (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 150 50 (rectangleSolid 75 75))
+
+printPositionFiveFour :: Board -> Picture
+printPositionFiveFour board |pieceHere (5,4) board == True && getColour (5,4) board == Black = Pictures[
+											Color blue (Translate 150 (-50) (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (5,4) board == True && getColour (5,4) board == White = Pictures[
+											Color blue (Translate 150 (-50) (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 150 (-50) (rectangleSolid 75 75))
+
+printPositionFiveFive :: Board -> Picture
+printPositionFiveFive board |pieceHere (5,5) board == True && getColour (5,5) board == Black = Pictures[
+											Color blue (Translate 150 (-150) (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (5,5) board == True && getColour (5,5) board == White = Pictures[
+											Color blue (Translate 150 (-150) (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 150 (-150) (rectangleSolid 75 75))
+
+printPositionFiveSix :: Board -> Picture
+printPositionFiveSix board |pieceHere (5,6) board == True && getColour (5,6) board == Black = Pictures[
+											Color blue (Translate 150 (-250) (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (5,6) board == True && getColour (5,6) board == White = Pictures[
+											Color blue (Translate 150 (-250) (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 150 (-250) (rectangleSolid 75 75))
+
+
+--column 6
+
+printPositionSixOne :: Board -> Picture
+printPositionSixOne board |pieceHere (6,1) board == True && getColour (6,1) board == Black = Pictures[
+											Color blue (Translate 250 250 (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (6,1) board == True && getColour (6,1) board == White = Pictures[
+											Color blue (Translate 250 250 (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 250 250 (rectangleSolid 75 75))
+
+printPositionSixTwo :: Board -> Picture
+printPositionSixTwo board |pieceHere (6,2) board == True && getColour (6,2) board == Black = Pictures[
+											Color blue (Translate 250 150 (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (6,2) board == True && getColour (6,2) board == White = Pictures[
+											Color blue (Translate 250 150 (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 250 150 (rectangleSolid 75 75))
+
+printPositionSixThree :: Board -> Picture
+printPositionSixThree board |pieceHere (6,3) board == True && getColour (6,3) board == Black = Pictures[
+											Color blue (Translate 250 50 (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (6,3) board == True && getColour (6,3) board == White = Pictures[
+											Color blue (Translate 250 50 (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 250 50 (rectangleSolid 75 75))
+
+printPositionSixFour :: Board -> Picture
+printPositionSixFour board |pieceHere (6,4) board == True && getColour (6,4) board == Black = Pictures[
+											Color blue (Translate 250 (-50) (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (6,4) board == True && getColour (6,4) board == White = Pictures[
+											Color blue (Translate 250 (-50) (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 250 (-50) (rectangleSolid 75 75))
+
+printPositionSixFive :: Board -> Picture
+printPositionSixFive board |pieceHere (6,5) board == True && getColour (6,5) board == Black = Pictures[
+											Color blue (Translate 250 (-150) (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (6,5) board == True && getColour (6,5) board == White = Pictures[
+											Color blue (Translate 250 (-150) (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 250 (-150) (rectangleSolid 75 75))
+
+printPositionSixSix :: Board -> Picture
+printPositionSixSix board |pieceHere (6,6) board == True && getColour (6,6) board == Black = Pictures[
+											Color blue (Translate 250 (-250) (rectangleSolid 75 75)),
+											Color black (Translate (-250) 250 (circleSolid 35))
+											]
+		       |pieceHere (6,6) board == True && getColour (6,6) board == White = Pictures[
+											Color blue (Translate 250 (-250) (rectangleSolid 75 75)),
+											Color white (Translate (-250) 250 (circleSolid 35))
+											]
+		       |otherwise = Color blue (Translate 250 (-250) (rectangleSolid 75 75))
+
+
 
 
 											
