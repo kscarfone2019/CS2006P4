@@ -49,9 +49,10 @@ getBestMove = undefined
 updateWorld :: Float -- ^ time since last update (you can ignore this)
             -> World -- ^ current world state
             -> World
-updateWorld t world |length (pieces (board world)) > 0 = trace ("Black has Won!") world {-&& checkWon (board world) == Just Black = trace ("Black has Won!") world
-		    |length (pieces (board world)) > 0 && checkWon (board world) == Just White = trace ("White has Won!") world-}
+updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = trace ("Black has Won!") (World (board world) (turn world) (True) (Black))
+		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = trace ("White has Won!") (World (board world) (turn world) (True) (White))
 		    |otherwise = world
+
 
 {- Hint: 'updateWorld' is where the AI gets called. If the world state
  indicates that it is a computer player's turn, updateWorld should use
