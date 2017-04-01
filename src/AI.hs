@@ -42,7 +42,7 @@ buildTree gen b c = let moves = gen b c in -- generated moves
         = case makeMove b c pos of -- try making the suggested move
                Nothing -> mkNextStates xs -- not successful, no new state
                Just b' -> (pos, buildTree gen b' (other c)) : mkNextStates xs
-                             -- successful, make move and build tree from 
+                             -- successful, make move and build tree from
                              -- here for opposite player
 
 -- Get the best next move from a (possibly infinite) game tree. This should
@@ -82,14 +82,7 @@ updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world)
  indicates that it is a computer player's turn, updateWorld should use
  'getBestMove' to find where the computer player should play, and update
  the board in the world state with that move.
-
- At first, it is reasonable for this to be a random move!
-
- If both players are human players, the simple version above will suffice,
- since it does nothing.
-
- In a complete implementation, 'updateWorld' should also check if either 
+ 
+ In a complete implementation, 'updateWorld' should also check if either
  player has won and display a message if so.
 -}
-
-
