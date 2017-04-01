@@ -4,10 +4,19 @@ import Board
 
 import Debug.Trace
 import Data.Maybe
+import Data.Tuple.Select
 
 data GameTree = GameTree { game_board :: Board,
                            game_turn :: Col,
                            next_moves :: [(Position, GameTree)] }
+
+possiblePositions = [(a, b) |a <- [1,2,3,4,5,6], b <-[1,2,3,4,5,6]]
+
+spaces :: Board -> [Position]
+spaces board = let fil x = checkPositionForPiece x board == False in filter fil possiblePositions
+
+gen :: Board -> Col -> [Position]
+gen board col = spaces board
 
 -- Given a function to generate plausible moves (i.e. board positions)
 -- for a player (Col) on a particular board, generate a (potentially)
@@ -43,7 +52,21 @@ buildTree gen b c = let moves = gen b c in -- generated moves
 getBestMove :: Int -- ^ Maximum search depth
                -> GameTree -- ^ Initial game tree
                -> Position
-getBestMove = undefined
+getBestMove max tree |length (next_moves tree) >34 = sel1 ((next_moves tree) !! 29)
+		     |length (next_moves tree) >32 = sel1 ((next_moves tree) !! 2)
+		     |length (next_moves tree) >30 = sel1 ((next_moves tree) !! 15)
+		     |length (next_moves tree) >28 = sel1 ((next_moves tree) !! 22)
+		     |length (next_moves tree) >26 = sel1 ((next_moves tree) !! 4)
+		     |length (next_moves tree) >24 = sel1 ((next_moves tree) !! 23)
+		     |length (next_moves tree) >22 = sel1 ((next_moves tree) !! 19)
+		     |length (next_moves tree) >20 = sel1 ((next_moves tree) !! 5)
+		     |length (next_moves tree) >15 = sel1 ((next_moves tree) !! 13)
+		     |length (next_moves tree) >13 = sel1 ((next_moves tree) !! 12)
+		     |length (next_moves tree) >10 = sel1 ((next_moves tree) !! 9)
+		     |length (next_moves tree) >6 = sel1 ((next_moves tree) !! 6)
+		     |length (next_moves tree) >3 = sel1 ((next_moves tree) !! 1)
+		     |otherwise = sel1 (head (next_moves tree))
+
 
 -- Update the world state after some time has passed
 updateWorld :: Float -- ^ time since last update (you can ignore this)
@@ -51,6 +74,7 @@ updateWorld :: Float -- ^ time since last update (you can ignore this)
             -> World
 updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = trace ("Black has Won!") (World (board world) (turn world) (True) (Black))
 		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = trace ("White has Won!") (World (board world) (turn world) (True) (White))
+		    |(turn world) == White = (World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world))
 		    |otherwise = world
 
 
