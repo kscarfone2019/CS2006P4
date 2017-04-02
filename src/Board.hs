@@ -49,7 +49,7 @@ initWorld = World initBoard Black False Empty
 -- (e.g. outside the range of the board, or there is a piece already there)
 makeMove :: Board -> Col -> Position -> Maybe Board
 makeMove board col pos |checkPositionForPiece pos board == False && checkPositionOnBoard board pos == True = Just (Board (size board) (target board) ([(pos, col)]++(pieces board)))
-		       |otherwise = Nothing
+            		       |otherwise = Nothing
 
 checkPositionOnBoard :: Board -> Position -> Bool
 checkPositionOnBoard board pos = elem pos (map (\ posi -> sel2  posi) piecesOnBoard)
@@ -230,5 +230,56 @@ checkMiddleDiagonalTwo board pos |checkPositionOnBoard board (sel1 pos+2, sel2 p
 
 -- An evaluation function for a minimax search. Given a board and a colour
 -- return an integer indicating how good the board is for that colour.
+
+--let fil x = checkPositionForPiece x board == False in filter fil possiblePositions
+
+checkAbove :: Position -> Col -> Board -> Bool
+checkAbove pos col board | checkPositionOnBoard board (sel1 pos-1, sel2 pos) == True && checkPositionForPiece (sel1 pos-1, sel2 pos) board == True && getPositionColor board (sel1 pos-1, sel2 pos) == col = True
+                   |otherwise = False
+
+checkBelow :: Position -> Col -> Board ->  Bool
+checkBelow pos col board | checkPositionOnBoard board (sel1 pos+1, sel2 pos) == True && checkPositionForPiece (sel1 pos+1, sel2 pos) board == True && getPositionColor board (sel1 pos+1, sel2 pos) == col = True
+                   |otherwise = False
+
+checkLeft :: Position -> Col ->Board ->  Bool
+checkLeft pos col board | checkPositionOnBoard board (sel1 pos, sel2 pos-1) == True && checkPositionForPiece (sel1 pos, sel2 pos-1) board == True && getPositionColor board (sel1 pos, sel2 pos-1) == col = True
+                  |otherwise = False
+
+checkRight :: Position -> Col -> Board ->  Bool
+checkRight pos col board | checkPositionOnBoard board (sel1 pos, sel2 pos+1) == True && checkPositionForPiece (sel1 pos, sel2 pos+1) board == True && getPositionColor board (sel1 pos, sel2 pos+1) == col = True
+                   |otherwise = False
+
+checkUpperLeft :: Position -> Col -> Board ->  Bool
+checkUpperLeft pos col board | checkPositionOnBoard board (sel1 pos-1, sel2 pos-1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos-1) board == True && getPositionColor board (sel1 pos-1, sel2 pos-1) == col = True
+                  |otherwise = False
+
+checkUpperRight:: Position -> Col -> Board ->  Bool
+checkUpperRight pos col board | checkPositionOnBoard board (sel1 pos-1, sel2 pos+1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos+1) board == True && getPositionColor board (sel1 pos-1, sel2 pos+1) == col = True
+                   |otherwise = False
+
+checkLowerLeft :: Position -> Col -> Board ->  Bool
+checkLowerLeft pos col board | checkPositionOnBoard board (sel1 pos+1, sel2 pos-1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos-1) board == True && getPositionColor board (sel1 pos+1, sel2 pos-1) == col = True
+                  |otherwise = False
+
+checkLowerRight :: Position -> Col -> Board ->  Bool
+checkLowerRight pos col board | checkPositionOnBoard board (sel1 pos+1, sel2 pos+1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos+1) board == True && getPositionColor board (sel1 pos+1, sel2 pos+1) == col = True
+                 |otherwise = False
+
+checkWhatColor :: (Position, Col) -> Board -> Col -> Bool
+checkWhatColor pos board col | getPositionColor board (sel1 pos) == col = True
+                             |otherwise = False
+
+checkForTwoInARow :: [(Position, Col)] -> Col -> Board -> Bool
+checkForTwoInARow pieces col board | length (let fil x = checkAbove (sel1 x) col board == True || checkBelow (sel1 x) col board == True || checkRight (sel1 x) col board == True || checkLeft (sel1 x) col board == True|| checkUpperLeft (sel1 x) col board == True|| checkLowerLeft (sel1 x) col board == True|| checkUpperRight (sel1 x) col board == True|| checkLowerRight (sel1 x) col board == True in filter fil pieces) > 0 = True
+                             |otherwise = False
+
+getPiecesForColor :: Board -> Col -> [(Position, Col)]
+getPiecesForColor board col = let fil x = checkWhatColor x board col == True in filter fil (pieces board)
+
+--if there are 3 in a row then return 3
+--if there are 2 in a row then return 2
+--otherwise return 1
 evaluate :: Board -> Col -> Int
-evaluate = undefined
+evaluate board col | checkWon board /= Nothing = 3
+                   | checkForTwoInARow (getPiecesForColor board col) col board == True = 2
+                   | otherwise = 1

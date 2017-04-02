@@ -199,7 +199,7 @@ printPositionTwoSix board |pieceHere (2,6) board == True && getColour (2,6) boar
 											Color white (Translate (-150) (-250) (circleSolid 35))
 											]
 		       |otherwise = Color blue (Translate (-150) (-250) (rectangleSolid 75 75))
-	
+
 
 --column 3
 
@@ -476,15 +476,9 @@ printPositionSixSix board |pieceHere (6,6) board == True && getColour (6,6) boar
 											]
 		       |otherwise = Color blue (Translate 250 (-250) (rectangleSolid 75 75))
 
-
-
-
-											
-
 pieceHere :: Position -> Board -> Bool
 pieceHere pos board = elem pos (map (\ posi -> sel1  posi) piecesOnBoard)
 		      where piecesOnBoard = pieces board
 
 getColour :: Position -> Board -> Col
 getColour pos board = sel2 (head[x | x <- pieces board, sel1 x == pos])
-

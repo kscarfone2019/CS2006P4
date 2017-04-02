@@ -5,6 +5,8 @@ import Board
 import Debug.Trace
 import Data.Maybe
 import Data.Tuple.Select
+import Data.List
+import Data.Ord
 
 data GameTree = GameTree { game_board :: Board,
                            game_turn :: Col,
@@ -45,6 +47,12 @@ buildTree gen b c = let moves = gen b c in -- generated moves
                              -- successful, make move and build tree from
                              -- here for opposite player
 
+treeTraverse :: Int -> [(Int,Position)] -> GameTree -> [(Int,Position)]
+treeTraverse depth moves tree |depth == 1 = (treeTraverse 2  ([((evaluate (game_board tree) (game_turn tree)),(sel1 (head (next_moves tree))))]++moves) (sel2(head (next_moves tree))) )++ (treeTraverse 2  ([((evaluate (game_board tree) (game_turn tree)),(sel1 ((next_moves tree)!!1)))]++moves) (sel2 ((next_moves tree)!!1)) )
+                              |depth == 2 = treeTraverse 3 moves (sel2(head (next_moves tree))) ++ treeTraverse 3 moves (sel2((next_moves tree)!! 1))
+                              |depth == 3 = (treeTraverse 4  ([((evaluate (game_board tree) (game_turn tree)),(sel1 (head (next_moves tree))))]++moves) (sel2 (head (next_moves tree)))) ++ (treeTraverse 4  ([((evaluate (game_board tree) (game_turn tree)),(sel1 ((next_moves tree)!!1)))]++moves) (sel2 ((next_moves tree)!!1)))
+                              |otherwise = moves
+
 -- Get the best next move from a (possibly infinite) game tree. This should
 -- traverse the game tree up to a certain depth, and pick the move which
 -- leads to the position with the best score for the player whose turn it
@@ -52,37 +60,27 @@ buildTree gen b c = let moves = gen b c in -- generated moves
 getBestMove :: Int -- ^ Maximum search depth
                -> GameTree -- ^ Initial game tree
                -> Position
-getBestMove max tree |length (next_moves tree) >34 = sel1 ((next_moves tree) !! 29)
-		     |length (next_moves tree) >32 = sel1 ((next_moves tree) !! 2)
-		     |length (next_moves tree) >30 = sel1 ((next_moves tree) !! 15)
-		     |length (next_moves tree) >28 = sel1 ((next_moves tree) !! 22)
-		     |length (next_moves tree) >26 = sel1 ((next_moves tree) !! 4)
-		     |length (next_moves tree) >24 = sel1 ((next_moves tree) !! 23)
-		     |length (next_moves tree) >22 = sel1 ((next_moves tree) !! 19)
-		     |length (next_moves tree) >20 = sel1 ((next_moves tree) !! 5)
-		     |length (next_moves tree) >15 = sel1 ((next_moves tree) !! 13)
-		     |length (next_moves tree) >13 = sel1 ((next_moves tree) !! 12)
-		     |length (next_moves tree) >10 = sel1 ((next_moves tree) !! 9)
-		     |length (next_moves tree) >6 = sel1 ((next_moves tree) !! 6)
-		     |length (next_moves tree) >3 = sel1 ((next_moves tree) !! 1)
-		     |otherwise = sel1 (head (next_moves tree))
+getBestMove depth tree |length (next_moves tree) > 1 = sel2(maximumFromList (treeTraverse depth [] tree))
+            		       |otherwise = sel1 (head (next_moves tree))
 
+maximumFromList :: [(Int,Position)] -> (Int,Position)
+maximumFromList list = head(sortBy (comparing $ fst) list)
 
 -- Update the world state after some time has passed
 updateWorld :: Float -- ^ time since last update (you can ignore this)
             -> World -- ^ current world state
             -> World
 updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = trace ("Black has Won!") (World (board world) (turn world) (True) (Black))
-		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = trace ("White has Won!") (World (board world) (turn world) (True) (White))
-		    |(turn world) == White = (World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world))
-		    |otherwise = world
+            		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = trace ("White has Won!") (World (board world) (turn world) (True) (White))
+            		    |(turn world) == White = (World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world))
+            		    |otherwise = world
 
 
 {- Hint: 'updateWorld' is where the AI gets called. If the world state
  indicates that it is a computer player's turn, updateWorld should use
  'getBestMove' to find where the computer player should play, and update
  the board in the world state with that move.
- 
+
  In a complete implementation, 'updateWorld' should also check if either
  player has won and display a message if so.
 -}
