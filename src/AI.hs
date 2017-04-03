@@ -47,10 +47,15 @@ buildTree gen b c = let moves = gen b c in -- generated moves
                              -- successful, make move and build tree from
                              -- here for opposite player
 
+
+
+addMovesToList :: GameTree -> [(Int, Position)] -> [(Int,Position)]
+addMovesToList tree moves = moves ++ [((evaluate (game_board tree) (game_turn tree)), sel1 x) | x <- (next_moves tree)]
+
 treeTraverse :: Int -> [(Int,Position)] -> GameTree -> [(Int,Position)]
-treeTraverse depth moves tree |depth == 1 = (treeTraverse 2  ([((evaluate (game_board tree) (game_turn tree)),(sel1 (head (next_moves tree))))]++moves) (sel2(head (next_moves tree))) )++ (treeTraverse 2  ([((evaluate (game_board tree) (game_turn tree)),(sel1 ((next_moves tree)!!1)))]++moves) (sel2 ((next_moves tree)!!1)) )
-                              |depth == 2 = treeTraverse 3 moves (sel2(head (next_moves tree))) ++ treeTraverse 3 moves (sel2((next_moves tree)!! 1))
-                              |depth == 3 = (treeTraverse 4  ([((evaluate (game_board tree) (game_turn tree)),(sel1 (head (next_moves tree))))]++moves) (sel2 (head (next_moves tree)))) ++ (treeTraverse 4  ([((evaluate (game_board tree) (game_turn tree)),(sel1 ((next_moves tree)!!1)))]++moves) (sel2 ((next_moves tree)!!1)))
+treeTraverse depth moves tree |depth == 1 = trace ("depth 1 The length is: " ++ show(length (next_moves tree))) (treeTraverse 2  (addMovesToList tree moves) (sel2(head (next_moves tree))) )++ (treeTraverse 2  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)) )
+                              |depth == 2 = trace ("depth 2 The length is: " ++ show(length (next_moves tree))) treeTraverse 3 moves (sel2(head (next_moves tree))) ++ treeTraverse 3 moves (sel2((next_moves tree)!! 1))
+                              |depth == 3 = trace ("depth 3 The length is: " ++ show(length (next_moves tree))) (treeTraverse 4  (addMovesToList tree moves) (sel2 (head (next_moves tree)))) ++ (treeTraverse 4  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)))
                               |otherwise = moves
 
 -- Get the best next move from a (possibly infinite) game tree. This should

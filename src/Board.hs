@@ -273,6 +273,11 @@ checkForTwoInARow :: [(Position, Col)] -> Col -> Board -> Bool
 checkForTwoInARow pieces col board | length (let fil x = checkAbove (sel1 x) col board == True || checkBelow (sel1 x) col board == True || checkRight (sel1 x) col board == True || checkLeft (sel1 x) col board == True|| checkUpperLeft (sel1 x) col board == True|| checkLowerLeft (sel1 x) col board == True|| checkUpperRight (sel1 x) col board == True|| checkLowerRight (sel1 x) col board == True in filter fil pieces) > 0 = True
                              |otherwise = False
 
+checkForThreeInARow :: [(Position, Col)] -> Board -> Bool
+checkForThreeInARow pieces board | length (let fil x = checkEast board (sel1 x) == True || checkWest board (sel1 x) == True || checkMiddleRow board (sel1 x) == True || checkNorth board (sel1 x) == True|| checkSouth board (sel1 x) == True|| checkMiddleColumn board (sel1 x) == True|| checkNorthEast board (sel1 x) == True|| checkSouthWest board (sel1 x) == True || checkNorthWest board (sel1 x) == True || checkSouthEast board (sel1 x) == True || checkMiddleDiagonalOne board (sel1 x) == True || checkMiddleDiagonalTwo board (sel1 x)== True in filter fil pieces) > 0 = True
+                            |otherwise = False
+
+
 getPiecesForColor :: Board -> Col -> [(Position, Col)]
 getPiecesForColor board col = let fil x = checkWhatColor x board col == True in filter fil (pieces board)
 
@@ -280,6 +285,6 @@ getPiecesForColor board col = let fil x = checkWhatColor x board col == True in 
 --if there are 2 in a row then return 2
 --otherwise return 1
 evaluate :: Board -> Col -> Int
-evaluate board col | checkWon board /= Nothing = 3
-                   | checkForTwoInARow (getPiecesForColor board col) col board == True = 2
-                   | otherwise = 1
+evaluate board col | checkForThreeInARow (getPiecesForColor board col) board == True = trace ("The value is 3") 3
+                   | checkForTwoInARow (getPiecesForColor board col) col board == True = trace ("The va;ue is 2") 2
+                   | otherwise = trace ("the value is 1") 1
