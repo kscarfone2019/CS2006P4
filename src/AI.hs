@@ -50,12 +50,12 @@ buildTree gen b c = let moves = gen b c in -- generated moves
 
 
 addMovesToList :: GameTree -> [(Int, Position)] -> [(Int,Position)]
-addMovesToList tree moves = moves ++ [((evaluate (game_board tree) (game_turn tree)), sel1 x) | x <- (next_moves tree)]
+addMovesToList tree moves = moves ++ [((evaluate (game_board (sel2 x)) (game_turn tree)), sel1 x) | x <- (next_moves tree)]
 
 treeTraverse :: Int -> [(Int,Position)] -> GameTree -> [(Int,Position)]
-treeTraverse depth moves tree |depth == 1 = trace ("depth 1 The length is: " ++ show(length (next_moves tree))) (treeTraverse 2  (addMovesToList tree moves) (sel2(head (next_moves tree))) )++ (treeTraverse 2  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)) )
-                              |depth == 2 = trace ("depth 2 The length is: " ++ show(length (next_moves tree))) treeTraverse 3 moves (sel2(head (next_moves tree))) ++ treeTraverse 3 moves (sel2((next_moves tree)!! 1))
-                              |depth == 3 = trace ("depth 3 The length is: " ++ show(length (next_moves tree))) (treeTraverse 4  (addMovesToList tree moves) (sel2 (head (next_moves tree)))) ++ (treeTraverse 4  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)))
+treeTraverse depth moves tree |depth == 1 =(treeTraverse 2  (addMovesToList tree moves) (sel2(head (next_moves tree))) )++ (treeTraverse 2  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)) )
+                            --  |depth == 2 = (treeTraverse 3 moves (sel2(head (next_moves tree))) ++ treeTraverse 3 moves (sel2((next_moves tree)!! 1)))
+                            --  |depth == 3 = trace ("depth 3") (treeTraverse 4  (addMovesToList tree moves) (sel2 (head (next_moves tree)))) ++ (treeTraverse 4  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)))
                               |otherwise = moves
 
 -- Get the best next move from a (possibly infinite) game tree. This should
@@ -68,8 +68,14 @@ getBestMove :: Int -- ^ Maximum search depth
 getBestMove depth tree |length (next_moves tree) > 1 = sel2(maximumFromList (treeTraverse depth [] tree))
             		       |otherwise = sel1 (head (next_moves tree))
 
+
 maximumFromList :: [(Int,Position)] -> (Int,Position)
-maximumFromList list = head(sortBy (comparing $ fst) list)
+maximumFromList list = trace ("\nlist: \n"++show(list)++ "\n\nsorted: \n"++show((sortBy (comparing $ fst) list))) (last ((sortBy (comparing $ fst) list)))
+
+{-
+maximumFromList :: [(Int,Position)] -> (Int,Position)
+maximumFromList list | length list == 35 =  (last (shuffle (sortBy (comparing $ fst) list) [1]))
+                     | otherwise = last(sortBy (comparing $ fst) list)-}
 
 -- Update the world state after some time has passed
 updateWorld :: Float -- ^ time since last update (you can ignore this)

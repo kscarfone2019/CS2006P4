@@ -15,7 +15,7 @@ import Data.Maybe
 -- 'trace' returns its second argument while printing its first argument
 -- to stderr, which can be a very useful way of debugging!
 handleInput :: Event -> World -> World
-handleInput (EventMotion (x, y)) world = trace ("Mouse moved to: " ++ show (x,y)) world
+--handleInput (EventMotion (x, y)) world = trace ("Mouse moved to: " ++ show (x,y)) world
 
 handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world |(won world) == False && x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,1))) (other (turn world)) (won world) (winner world))
 																																  |(won world) == False && x<(-212.5) && x>(-287.5) && y>112.5 && y< 187.5 && (makeMove (board world) (turn world) (1,2)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,2))) (other (turn world)) (won world) (winner world))
@@ -61,8 +61,8 @@ handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world |(won world) =
 																																  |otherwise = world
 
 
-handleInput (EventKey (Char k) Down _ _) world = trace ("Key " ++ show k ++ " down") world
-handleInput (EventKey (Char k) Up _ _) world = trace ("Key " ++ show k ++ " up") world
+--handleInput (EventKey (Char k) Down _ _) world = trace ("Key " ++ show k ++ " down") world
+--handleInput (EventKey (Char k) Up _ _) world = trace ("Key " ++ show k ++ " up") world
 handleInput e world = world
 
 {- Hint: when the 'World' is in a state where it is the human player's
