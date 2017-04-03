@@ -16,6 +16,8 @@ import Data.Maybe
 -- to stderr, which can be a very useful way of debugging!
 handleInput :: Event -> World -> World
 --handleInput (EventMotion (x, y)) world = trace ("Mouse moved to: " ++ show (x,y)) world
+handleInput (EventKey (MouseButton RightButton) Up m (x, y)) world | length (pieces (board world)) > 0 = undoMove world
+                                                                   | otherwise = world
 
 handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world |(won world) == False && x<(-212.5) && x>(-287.5) && y>212.5 && y< 287.5 && (makeMove (board world) (turn world) (1,1)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,1))) (other (turn world)) (won world) (winner world))
 																																  |(won world) == False && x<(-212.5) && x>(-287.5) && y>112.5 && y< 187.5 && (makeMove (board world) (turn world) (1,2)) /= Nothing = (World (fromJust(makeMove (board world) (turn world) (1,2))) (other (turn world)) (won world) (winner world))

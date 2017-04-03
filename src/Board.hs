@@ -51,6 +51,11 @@ makeMove :: Board -> Col -> Position -> Maybe Board
 makeMove board col pos |checkPositionForPiece pos board == False && checkPositionOnBoard board pos == True = Just (Board (size board) (target board) ([(pos, col)]++(pieces board)))
             		       |otherwise = Nothing
 
+undoMove :: World -> World
+undoMove world = do
+        let newBoard =  (Board (size (board world)) (target (board world)) (tail(tail(pieces (board world)))))
+        World (newBoard) (turn world) (won world) (winner world)
+
 checkPositionOnBoard :: Board -> Position -> Bool
 checkPositionOnBoard board pos = elem pos (map (\ posi -> sel2  posi) piecesOnBoard)
 		       where piecesOnBoard = positions
