@@ -6,64 +6,91 @@ import Data.Tuple.Select
 
 -- Given a world state, return a Picture which will render the world state.
 drawWorld :: World -> Picture
-
 drawWorld w |(won w) == True && (winner w) == Black = Pictures[
-					Color white (Translate (-150) 100 (Text "Black")),
-					Color white (Translate (-150) (-100) (Text "Wins!"))
+					Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "Black Wins!"))),
+					printBoard w,
+					printButtons w
 					]
 	    |(won w) == True && (winner w) == White  = Pictures[
-					Color white (Translate (-150) 100 (Text "White")),
-					Color white (Translate (-140) (-100) (Text "Wins!"))
+					Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "White Wins!"))),
+					printBoard w,
+					printButtons w
 					]
-	    |otherwise = Pictures [
-				--column 1
-				printPositionOneOne (board w),
-				printPositionOneTwo (board w),
-				printPositionOneThree (board w),
-				printPositionOneFour (board w),
-				printPositionOneFive (board w),
-				printPositionOneSix (board w),
+	    |otherwise = Pictures[
+											printBoard w,
+											printButtons w
+											]
 
-				--column 2
-				printPositionTwoOne (board w),
-				printPositionTwoTwo (board w),
-				printPositionTwoThree (board w),
-				printPositionTwoFour (board w),
-				printPositionTwoFive (board w),
-				printPositionTwoSix (board w),
+printButtons :: World -> Picture
+printButtons w |length (pieces (board w)) >0 =  Pictures [
+																											printUndoButton,
+																											printRestartButton
+																											]
+							 |otherwise = Pictures [printRestartButton]
 
-				--column 3
-				printPositionThreeOne (board w),
-				printPositionThreeTwo (board w),
-				printPositionThreeThree (board w),
-				printPositionThreeFour (board w),
-				printPositionThreeFive (board w),
-				printPositionThreeSix (board w),
+printRestartButton ::Picture
+printRestartButton = Pictures [
+													Color violet (Translate (-95) (-350) (rectangleSolid 80 40)),
+													Color white (Translate (-128) (-355) (Scale 0.15 0.15 (Text "Restart!")))
+													]
 
-				--column 4
-				printPositionFourOne (board w),
-				printPositionFourTwo (board w),
-				printPositionFourThree (board w),
-				printPositionFourFour (board w),
-				printPositionFourFive (board w),
-				printPositionFourSix (board w),
+printUndoButton ::Picture
+printUndoButton  = Pictures [
+											Color violet (Translate (-200) (-350) (rectangleSolid 60 40)),
+											Color white (Translate (-224) (-355) (Scale 0.15 0.15 (Text "Undo!")))
+											]
 
-				--column 5
-				printPositionFiveOne (board w),
-				printPositionFiveTwo (board w),
-				printPositionFiveThree (board w),
-				printPositionFiveFour (board w),
-				printPositionFiveFive (board w),
-				printPositionFiveSix (board w),
+printBoard :: World -> Picture
+printBoard w = Pictures [
+											--column 1
+											printPositionOneOne (board w),
+											printPositionOneTwo (board w),
+											printPositionOneThree (board w),
+											printPositionOneFour (board w),
+											printPositionOneFive (board w),
+											printPositionOneSix (board w),
 
-				--column 6
-				printPositionSixOne (board w),
-				printPositionSixTwo (board w),
-				printPositionSixThree (board w),
-				printPositionSixFour (board w),
-				printPositionSixFive (board w),
-				printPositionSixSix (board w)
-				]
+											--column 2
+											printPositionTwoOne (board w),
+											printPositionTwoTwo (board w),
+											printPositionTwoThree (board w),
+											printPositionTwoFour (board w),
+											printPositionTwoFive (board w),
+											printPositionTwoSix (board w),
+
+											--column 3
+											printPositionThreeOne (board w),
+											printPositionThreeTwo (board w),
+											printPositionThreeThree (board w),
+											printPositionThreeFour (board w),
+											printPositionThreeFive (board w),
+											printPositionThreeSix (board w),
+
+											--column 4
+											printPositionFourOne (board w),
+											printPositionFourTwo (board w),
+											printPositionFourThree (board w),
+											printPositionFourFour (board w),
+											printPositionFourFive (board w),
+											printPositionFourSix (board w),
+
+											--column 5
+											printPositionFiveOne (board w),
+											printPositionFiveTwo (board w),
+											printPositionFiveThree (board w),
+											printPositionFiveFour (board w),
+											printPositionFiveFive (board w),
+											printPositionFiveSix (board w),
+
+											--column 6
+											printPositionSixOne (board w),
+											printPositionSixTwo (board w),
+											printPositionSixThree (board w),
+											printPositionSixFour (board w),
+											printPositionSixFive (board w),
+											printPositionSixSix (board w)
+											]
+
 
 --column 1
 printPositionOneOne :: Board -> Picture

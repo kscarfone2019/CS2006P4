@@ -52,11 +52,11 @@ buildTree gen b c = let moves = gen b c in -- generated moves
 addMovesToList :: GameTree -> [(Int, Position)] -> [(Int,Position)]
 addMovesToList tree moves = moves ++ [((evaluate (game_board (sel2 x)) (game_turn tree)), sel1 x) | x <- (next_moves tree)]
 
-treeTraverse :: Int -> [(Int,Position)] -> GameTree -> [(Int,Position)]
-treeTraverse depth moves tree |depth == 1 =(treeTraverse 2  (addMovesToList tree moves) (sel2(head (next_moves tree))) )++ (treeTraverse 2  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)) )
-                            --  |depth == 2 = (treeTraverse 3 moves (sel2(head (next_moves tree))) ++ treeTraverse 3 moves (sel2((next_moves tree)!! 1)))
-                            --  |depth == 3 = trace ("depth 3") (treeTraverse 4  (addMovesToList tree moves) (sel2 (head (next_moves tree)))) ++ (treeTraverse 4  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)))
-                              |otherwise = moves
+treeTraverse :: Int -> Int -> [(Int,Position)] -> GameTree -> [(Int,Position)]
+treeTraverse maxDepth depth moves tree |depth == 1 =(treeTraverse maxDepth 2 (addMovesToList tree moves) (sel2(head (next_moves tree))) )++ (treeTraverse maxDepth 2 (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)) )
+                                    --  |depth == 2 = (treeTraverse 3 moves (sel2(head (next_moves tree))) ++ treeTraverse 3 moves (sel2((next_moves tree)!! 1)))
+                                    --  |depth == 3 = trace ("depth 3") (treeTraverse 4  (addMovesToList tree moves) (sel2 (head (next_moves tree)))) ++ (treeTraverse 4  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)))
+                                       |otherwise = moves
 
 -- Get the best next move from a (possibly infinite) game tree. This should
 -- traverse the game tree up to a certain depth, and pick the move which
@@ -65,12 +65,12 @@ treeTraverse depth moves tree |depth == 1 =(treeTraverse 2  (addMovesToList tree
 getBestMove :: Int -- ^ Maximum search depth
                -> GameTree -- ^ Initial game tree
                -> Position
-getBestMove depth tree |length (next_moves tree) > 1 = sel2(maximumFromList (treeTraverse depth [] tree))
+getBestMove depth tree |length (next_moves tree) > 1 = sel2(maximumFromList (treeTraverse depth 1 [] tree))
             		       |otherwise = sel1 (head (next_moves tree))
 
 
 maximumFromList :: [(Int,Position)] -> (Int,Position)
-maximumFromList list = trace ("\nlist: \n"++show(list)++ "\n\nsorted: \n"++show((sortBy (comparing $ fst) list))) (last ((sortBy (comparing $ fst) list)))
+maximumFromList list = (last ((sortBy (comparing $ fst) list)))
 
 {-
 maximumFromList :: [(Int,Position)] -> (Int,Position)
