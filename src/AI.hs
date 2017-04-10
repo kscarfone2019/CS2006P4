@@ -12,10 +12,11 @@ data GameTree = GameTree { game_board :: Board,
                            game_turn :: Col,
                            next_moves :: [(Position, GameTree)] }
 
-possiblePositions = [(a, b) |a <- [1,2,3,4,5,6], b <-[1,2,3,4,5,6]]
+possiblePositions :: Board -> [(Int, Int)]
+possiblePositions board = [(a, b) |a <- [1,2..(size board)], b <-[1,2..(size board)]]
 
 spaces :: Board -> [Position]
-spaces board = let fil x = checkPositionForPiece x board == False in filter fil possiblePositions
+spaces board = let fil x = checkPositionForPiece x board == False in filter fil (possiblePositions board)
 
 gen :: Board -> Col -> [Position]
 gen board col = spaces board
@@ -53,7 +54,7 @@ addMovesToList :: GameTree -> [(Int, Position)] -> [(Int,Position)]
 addMovesToList tree moves = moves ++ [((evaluate (game_board (sel2 x)) (game_turn tree)), sel1 x) | x <- (next_moves tree)]
 
 treeTraverse :: Int -> Int -> [(Int,Position)] -> GameTree -> [(Int,Position)]
-treeTraverse maxDepth depth moves tree |depth == 1 =(treeTraverse maxDepth 2 (addMovesToList tree moves) (sel2(head (next_moves tree))) )++ (treeTraverse maxDepth 2 (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)) )
+treeTraverse maxDepth depth moves tree |depth == 1 =(treeTraverse maxDepth 2 (addMovesToList tree moves) (sel2(head (next_moves tree))) )++ (treeTraverse maxDepth 2  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)) )
                                     --  |depth == 2 = (treeTraverse 3 moves (sel2(head (next_moves tree))) ++ treeTraverse 3 moves (sel2((next_moves tree)!! 1)))
                                     --  |depth == 3 = trace ("depth 3") (treeTraverse 4  (addMovesToList tree moves) (sel2 (head (next_moves tree)))) ++ (treeTraverse 4  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)))
                                        |otherwise = moves
@@ -81,8 +82,8 @@ maximumFromList list | length list == 35 =  (last (shuffle (sortBy (comparing $ 
 updateWorld :: Float -- ^ time since last update (you can ignore this)
             -> World -- ^ current world state
             -> World
-updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = trace ("Black has Won!") (World (board world) (turn world) (True) (Black))
-            		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = trace ("White has Won!") (World (board world) (turn world) (True) (White))
+updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = (World (board world) (turn world) (True) (Black))
+            		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = (World (board world) (turn world) (True) (White))
             		    |(turn world) == White = (World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world))
             		    |otherwise = world
 

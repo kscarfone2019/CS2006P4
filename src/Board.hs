@@ -29,7 +29,7 @@ data Board = Board { size :: Int,
   deriving (Show, Eq)
 
 -- Default board is 6x6, target is 3 in a row, no initial pieces
-initBoard = Board 6 3 []
+initBoard = Board 19 3 []
 
 -- Overall state is the board and whose turn it is, plus any further
 -- information about the world (this may later include, for example, player
@@ -62,13 +62,15 @@ undoMove world = do
 
 checkPositionOnBoard :: Board -> Position -> Bool
 checkPositionOnBoard board pos = elem pos piecesOnBoard
-		       where piecesOnBoard = positions
+		       where piecesOnBoard = (positions board)
 
 checkPositionForPiece :: Position -> Board -> Bool
 checkPositionForPiece pos board = elem pos (map (\ posi -> sel1  posi) piecesOnBoard)
 		          where piecesOnBoard = pieces board
 
-positions = [(a, b) |a <- [1,2,3,4,5,6], b <-[1,2,3,4,5,6]]
+positions :: Board -> [(Int, Int)]
+positions board = [(a, b) |a <- [1,2..(size board)], b <-[1,2..(size board)]]
+
 
 getPositionColor :: Board -> Position -> Col
 getPositionColor board pos | checkPositionOnBoard board pos == True && checkPositionForPiece pos board == True = sel2 (head[x | x <- pieces board, sel1 x == pos])
