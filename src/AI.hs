@@ -88,6 +88,11 @@ updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world)
             		    |otherwise = world
 
 
+{-updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = (World (board world) (turn world) (True) (Black))
+            		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = (World (board world) (turn world) (True) (White))
+            		    |otherwise = world-}
+
+
 {- Hint: 'updateWorld' is where the AI gets called. If the world state
  indicates that it is a computer player's turn, updateWorld should use
  'getBestMove' to find where the computer player should play, and update

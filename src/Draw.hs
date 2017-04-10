@@ -8,14 +8,16 @@ import Debug.Trace
 -- Given a world state, return a Picture which will render the world state.
 drawWorld :: World -> Picture
 drawWorld w |(won w) == True && (winner w) == Black = Pictures[
-					Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "Black Wins!"))),
 					printBoard w,
-					printButtons w
+					printButtons w,
+					Color violet (Translate (-170) 345 (rectangleSolid 100000 80)),
+					Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "Black Wins!")))
 					]
 	    |(won w) == True && (winner w) == White  = Pictures[
-					Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "White Wins!"))),
 					printBoard w,
-					printButtons w
+					printButtons w,
+					Color violet (Translate (-170) 345 (rectangleSolid 100000 80)),
+					Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "White Wins!")))
 					]
 	    |otherwise = Pictures[
 											printBoard w,
@@ -23,26 +25,76 @@ drawWorld w |(won w) == True && (winner w) == Black = Pictures[
 											]
 
 printButtons :: World -> Picture
-printButtons w |length (pieces (board w)) >0 =  Pictures [
-																											printUndoButton,
-																											printRestartButton
-																											]
-							 |otherwise = Pictures [printRestartButton]
+printButtons w |length (pieces (board w)) >0 && target (board w) == 9 =  Pictures [
+																																						printUndoButton,
+																																						printMostButtons w
+																																						]
+							 |otherwise = Pictures [printMostButtons w]
 
-printRestartButton ::Picture
+printMostButtons :: World -> Picture
+printMostButtons w = Pictures [
+												printRestartButton,
+												printIncreaseBoardSizeButton,
+												printBoardSizeButton,
+												printDecreaseBoardSizeButton,
+												printIncreaseLineButton,
+												printLineSizeButton w,
+												printDecreaseLineButton
+												]
+
+printRestartButton :: Picture
 printRestartButton = Pictures [
-													Color violet (Translate (-95) (-360) (rectangleSolid 80 40)),
-													Color white (Translate (-128) (-365) (Scale 0.15 0.15 (Text "Restart!")))
+													Color violet (Translate (-95) (-370) (rectangleSolid 80 40)),
+													Color white (Translate (-128) (-375) (Scale 0.15 0.15 (Text "Restart!")))
 													]
 
-printUndoButton ::Picture
+printUndoButton :: Picture
 printUndoButton  = Pictures [
-											Color violet (Translate (-200) (-360) (rectangleSolid 60 40)),
-											Color white (Translate (-224) (-365) (Scale 0.15 0.15 (Text "Undo!")))
+											Color violet (Translate (-200) (-370) (rectangleSolid 60 40)),
+											Color white (Translate (-224) (-375) (Scale 0.15 0.15 (Text "Undo!")))
 											]
 
+printIncreaseBoardSizeButton :: Picture
+printIncreaseBoardSizeButton = Pictures [
+																	Color violet (Translate (-400) (270) (rectangleSolid 60 30)),
+																	Color white (Translate (-413) (265) (Scale 0.15 0.15 (Text "/\\")))
+																	]
+
+printBoardSizeButton :: Picture
+printBoardSizeButton = Pictures[
+													Color violet (Translate (-400) (215) (rectangleSolid 60 55)),
+													Color white (Translate (-425) (220) (Scale 0.15 0.15 (Text "Board"))),
+													Color white (Translate (-418) (195) (Scale 0.15 0.15 (Text "Size")))
+														]
+
+printDecreaseBoardSizeButton :: Picture
+printDecreaseBoardSizeButton = Pictures [
+																	Color violet (Translate (-400) (160) (rectangleSolid 60 30)),
+																	Color white (Translate (-413) (155) (Scale 0.15 0.15 (Text "\\/")))
+																	]
+
+printIncreaseLineButton :: Picture
+printIncreaseLineButton = Pictures [
+																Color violet (Translate (-400) (110) (rectangleSolid 60 30)),
+																Color white (Translate (-413) (105) (Scale 0.15 0.15 (Text "/\\")))
+																]
+
+printLineSizeButton :: World -> Picture
+printLineSizeButton world = Pictures[
+																Color violet (Translate (-400) (50) (rectangleSolid 60 70)),
+																Color white (Translate (-420) (60) (Scale 0.15 0.15 (Text "Line"))),
+																Color white (Translate (-420) (40) (Scale 0.15 0.15 (Text "Size:"))),
+																Color white (Translate (-410) (20) (Scale 0.15 0.15 (Text (show(target (board world))))))
+																]
+
+printDecreaseLineButton :: Picture
+printDecreaseLineButton = Pictures [
+																Color violet (Translate (-400) (-10) (rectangleSolid 60 30)),
+																Color white (Translate (-413) (-15) (Scale 0.15 0.15 (Text "\\/")))
+																]
+
 printBoard :: World -> Picture
-printBoard w = Pictures [square x y (board w)| x <- reverse(generateList (board w)), y <- (generateList (board w))]
+printBoard w = Pictures [square x y (board w)| x <- reverse(generateXList (board w)), y <- (generateList (board w))]
 
 square :: Float -> Float -> Board -> Picture
 square x y board |pieceHere ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == True && getColour ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == Black = Pictures[
@@ -71,7 +123,6 @@ getSquareSize board |size board == 7 = 60
 										|size board == 19 = 25
 										|otherwise = 75
 
-
 getCircleSize :: Board -> Float
 getCircleSize board |size board == 7 = 30
 										|size board == 8 = 28
@@ -87,6 +138,10 @@ getCircleSize board |size board == 7 = 30
 										|size board == 18 = 12
 										|size board == 19 = 12
 										|otherwise = 35
+
+generateXList :: Board -> [Float]
+generateXList board |size board == 19 = [345, 307, 269, 231, 193, 155, 117, 79, 41, 3, -35, -73, -111, -149, -187, -225, -262, -300, -338]
+									  |otherwise = generateList board
 
 generateList :: Board -> [Float]
 generateList board |size board == 7 = [250, 167, 84, 1, -82, -165, -248]
@@ -106,25 +161,25 @@ generateList board |size board == 7 = [250, 167, 84, 1, -82, -165, -248]
 
 
 convertToColumnMultiColumn :: Float -> Board -> Int
-convertToColumnMultiColumn x board |length (generateList board) > 0 && x<((reverse(generateList board)!!0)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!0)-((getSquareSize board)/2)) = 1
-							               |length (generateList board) > 1 && x<((reverse(generateList board)!!1)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!1)-((getSquareSize board)/2)) = 2
-							               |length (generateList board) > 2 && x<((reverse(generateList board)!!2)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!2)-((getSquareSize board)/2))  = 3
-							               |length (generateList board) > 3 && x<((reverse(generateList board)!!3)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!3)-((getSquareSize board)/2))  = 4
-							               |length (generateList board) > 4 && x<((reverse(generateList board)!!4)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!4)-((getSquareSize board)/2))  = 5
-							               |length (generateList board) > 5 && x<((reverse(generateList board)!!5)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!5)-((getSquareSize board)/2))  = 6
-														 |length (generateList board) > 6 && x<((reverse(generateList board)!!6)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!6)-((getSquareSize board)/2))  = 7
-														 |length (generateList board) > 7 && x<((reverse(generateList board)!!7)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!7)-((getSquareSize board)/2))  = 8
-														 |length (generateList board) > 8 && x<((reverse(generateList board)!!8)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!8)-((getSquareSize board)/2))  = 9
-														 |length (generateList board) > 9 && x<((reverse(generateList board)!!9)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!9)-((getSquareSize board)/2))  = 10
-														 |length (generateList board) > 10 && x<((reverse(generateList board)!!10)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!10)-((getSquareSize board)/2))  = 11
-														 |length (generateList board) > 11 && x<((reverse(generateList board)!!11)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!11)-((getSquareSize board)/2))  = 12
-														 |length (generateList board) > 12 && x<((reverse(generateList board)!!12)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!12)-((getSquareSize board)/2))  = 13
-														 |length (generateList board) > 13 && x<((reverse(generateList board)!!13)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!13)-((getSquareSize board)/2))  = 14
-														 |length (generateList board) > 14 && x<((reverse(generateList board)!!14)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!14)-((getSquareSize board)/2))  = 15
-														 |length (generateList board) > 15 && x<((reverse(generateList board)!!15)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!15)-((getSquareSize board)/2))  = 16
-														 |length (generateList board) > 16 && x<((reverse(generateList board)!!16)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!16)-((getSquareSize board)/2))  = 17
-														 |length (generateList board) > 17 && x<((reverse(generateList board)!!17)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!17)-((getSquareSize board)/2))  = 18
-														 |length (generateList board) > 18 && x<((reverse(generateList board)!!18)+((getSquareSize board)/2)) && x>((reverse(generateList board)!!18)-((getSquareSize board)/2))  = 19
+convertToColumnMultiColumn x board |length (generateXList board) > 0 && x<((reverse(generateXList board)!!0)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!0)-((getSquareSize board)/2)) = 1
+							               |length (generateXList board) > 1 && x<((reverse(generateXList board)!!1)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!1)-((getSquareSize board)/2)) = 2
+							               |length (generateXList board) > 2 && x<((reverse(generateXList board)!!2)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!2)-((getSquareSize board)/2))  = 3
+							               |length (generateXList board) > 3 && x<((reverse(generateXList board)!!3)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!3)-((getSquareSize board)/2))  = 4
+							               |length (generateXList board) > 4 && x<((reverse(generateXList board)!!4)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!4)-((getSquareSize board)/2))  = 5
+							               |length (generateXList board) > 5 && x<((reverse(generateXList board)!!5)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!5)-((getSquareSize board)/2))  = 6
+														 |length (generateXList board) > 6 && x<((reverse(generateXList board)!!6)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!6)-((getSquareSize board)/2))  = 7
+														 |length (generateXList board) > 7 && x<((reverse(generateXList board)!!7)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!7)-((getSquareSize board)/2))  = 8
+														 |length (generateXList board) > 8 && x<((reverse(generateXList board)!!8)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!8)-((getSquareSize board)/2))  = 9
+														 |length (generateXList board) > 9 && x<((reverse(generateXList board)!!9)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!9)-((getSquareSize board)/2))  = 10
+														 |length (generateXList board) > 10 && x<((reverse(generateXList board)!!10)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!10)-((getSquareSize board)/2))  = 11
+														 |length (generateXList board) > 11 && x<((reverse(generateXList board)!!11)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!11)-((getSquareSize board)/2))  = 12
+														 |length (generateXList board) > 12 && x<((reverse(generateXList board)!!12)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!12)-((getSquareSize board)/2))  = 13
+														 |length (generateXList board) > 13 && x<((reverse(generateXList board)!!13)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!13)-((getSquareSize board)/2))  = 14
+														 |length (generateXList board) > 14 && x<((reverse(generateXList board)!!14)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!14)-((getSquareSize board)/2))  = 15
+														 |length (generateXList board) > 15 && x<((reverse(generateXList board)!!15)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!15)-((getSquareSize board)/2))  = 16
+														 |length (generateXList board) > 16 && x<((reverse(generateXList board)!!16)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!16)-((getSquareSize board)/2))  = 17
+														 |length (generateXList board) > 17 && x<((reverse(generateXList board)!!17)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!17)-((getSquareSize board)/2))  = 18
+														 |length (generateXList board) > 18 && x<((reverse(generateXList board)!!18)+((getSquareSize board)/2)) && x>((reverse(generateXList board)!!18)-((getSquareSize board)/2))  = 19
 							               |otherwise = 0
 
 
@@ -151,7 +206,7 @@ convertToColumnMultiRow y board |length (generateList board) > 0 && y<(((generat
 															  |length (generateList board) > 17 && y<(((generateList board)!!17)+((getSquareSize board)/2)) && y>(((generateList board)!!17)-((getSquareSize board)/2))  = 18
 															  |length (generateList board) > 18 && y<(((generateList board)!!18)+((getSquareSize board)/2)) && y>(((generateList board)!!18)-((getSquareSize board)/2))  = 19
 								                |otherwise = 0
-
+{-
 --column 1
 printPositionOneOne :: Board -> Picture
 printPositionOneOne board |pieceHere (1,1) board == True && getColour (1,1) board == Black = Pictures[
@@ -561,7 +616,7 @@ printPositionSixSix board |pieceHere (6,6) board == True && getColour (6,6) boar
 											Color blue (Translate 250 (-250) (rectangleSolid 75 75)),
 											Color white (Translate 250 (-250) (circleSolid 35))
 											]
-		       |otherwise = Color blue (Translate 250 (-250) (rectangleSolid 75 75))
+		       |otherwise = Color blue (Translate 250 (-250) (rectangleSolid 75 75))-}
 
 pieceHere :: Position -> Board -> Bool
 pieceHere pos board = elem pos (map (\ posi -> sel1  posi) piecesOnBoard)
