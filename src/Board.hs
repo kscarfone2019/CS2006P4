@@ -27,8 +27,7 @@ data Board = Board { size :: Int,
                      pieces :: [(Position, Col)]
                    }
   deriving (Show, Eq)
-
--- Default board is 6x6, target is 3 in a row, no initial pieces
+  
 initBoard = Board 6 3 []
 
 -- Overall state is the board and whose turn it is, plus any further
@@ -42,8 +41,6 @@ data World = World { board :: Board,
                      turn :: Col,
             		     won :: Bool,
             		     winner :: Col }
-
-initWorld = World initBoard Black False Empty
 
 -- Play a move on the board; return 'Nothing' if the move is invalid
 -- (e.g. outside the range of the board, or there is a piece already there)
