@@ -25,10 +25,10 @@ drawWorld w |(won w) == True && (winner w) == Black = Pictures[
 											]
 
 printButtons :: World -> Picture
-printButtons w |length (pieces (board w)) >0 && target (board w) == 9 =  Pictures [
-																																						printUndoButton,
-																																						printMostButtons w
-																																						]
+printButtons w |length (pieces (board w)) >0 =  Pictures [
+																										printUndoButton,
+																										printMostButtons w
+																										]
 							 |otherwise = Pictures [printMostButtons w]
 
 printMostButtons :: World -> Picture
