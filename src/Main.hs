@@ -9,8 +9,6 @@ import Draw
 import Input
 import AI
 
---initBoard = Board 6 3 []
-
 -- 'play' starts up a graphics window and sets up handlers for dealing
 -- with inputs and updating the world state.
 --
@@ -30,7 +28,7 @@ main = do
   let initBoard = if length args > 0 && ((read (head (tail args)) ::Int )== 3 || (read (head (tail args)) ::Int) == 5) && ((read (head args) ::Int)>5 && (read (head args) ::Int)<20)
                   then Board (read (head args) ::Int) (read (head (tail args)) ::Int) []
                   else Board 6 3 []
-  let initWorld = World initBoard Black False Empty
+  let initWorld = World initBoard Black False Empty savedBoard
   play (InWindow "Gomoku" (900, 900) (10, 10)) black 10
             initWorld -- in Board.hs
             drawWorld -- in Draw.hs

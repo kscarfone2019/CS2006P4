@@ -39,13 +39,29 @@ printMostButtons w = Pictures [
 												printDecreaseBoardSizeButton,
 												printIncreaseLineButton,
 												printLineSizeButton w,
-												printDecreaseLineButton
+												printDecreaseLineButton,
+												printSaveButton,
+												printLoadButton
 												]
 
 printRestartButton :: Picture
 printRestartButton = Pictures [
 													Color violet (Translate (-95) (-370) (rectangleSolid 80 40)),
 													Color white (Translate (-128) (-375) (Scale 0.15 0.15 (Text "Restart!")))
+													]
+
+printSaveButton :: Picture
+printSaveButton = Pictures [
+													Color violet (Translate (-400) (-75) (rectangleSolid 60 50)),
+													Color white (Translate (-422) (-72) (Scale 0.15 0.15 (Text "Save"))),
+													Color white (Translate (-427) (-93) (Scale 0.15 0.15 (Text "Game")))
+													]
+
+printLoadButton :: Picture
+printLoadButton = Pictures [
+													Color violet (Translate (-400) (-150) (rectangleSolid 60 50)),
+													Color white (Translate (-422) (-148) (Scale 0.15 0.15 (Text "Load"))),
+													Color white (Translate (-427) (-168) (Scale 0.15 0.15 (Text "Game")))
 													]
 
 printUndoButton :: Picture
