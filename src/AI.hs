@@ -81,11 +81,11 @@ maximumFromList list | length list == 35 =  (last (shuffle (sortBy (comparing $ 
 -- Update the world state after some time has passed
 updateWorld :: Float -- ^ time since last update (you can ignore this)
             -> World -- ^ current world state
-            -> World
-updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = (World (board world) (turn world) (True) (Black) (saveBoard world))
-            		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = (World (board world) (turn world) (True) (White) (saveBoard world))
-            		    |(turn world) == White = (World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world) (saveBoard world))
-            		    |otherwise = world
+            -> IO World
+updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = do return (World (board world) (turn world) (True) (Black) False)
+            		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = do return (World (board world) (turn world) (True) (White) False)
+            		    |(turn world) == White = do return (World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world) False)
+            		    |otherwise = do return (world)
 
 
 {-updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = (World (board world) (turn world) (True) (Black))

@@ -5,7 +5,7 @@ import Debug.Trace
 import Data.Maybe
 
 data Col = Black | White | Empty
-  deriving (Show, Eq)
+  deriving (Show, Eq, Read)
 
 other :: Col -> Col
 other Black = White
@@ -26,9 +26,7 @@ data Board = Board { size :: Int,
                      target :: Int,
                      pieces :: [(Position, Col)]
                    }
-  deriving (Show, Eq)
-
-savedBoard = Board 6 3 []
+  deriving (Show, Eq, Read)
 
 initBoard = Board 6 3 []
 
@@ -43,7 +41,8 @@ data World = World { board :: Board,
                      turn :: Col,
             		     won :: Bool,
             		     winner :: Col,
-                     saveBoard :: Board}
+                     hint :: Bool}
+    deriving(Show, Read)
 
 -- Play a move on the board; return 'Nothing' if the move is invalid
 -- (e.g. outside the range of the board, or there is a piece already there)
@@ -51,36 +50,30 @@ makeMove :: Board -> Col -> Position -> Maybe Board
 makeMove board col pos |checkPositionForPiece pos board == False && checkPositionOnBoard board pos == True = Just (Board (size board) (target board) ([(pos, col)]++(pieces board)))
             		       |otherwise = Nothing
 
-saveGame :: World -> World
-saveGame world = (World (board world) Black False Empty (board world))
-
-loadGame :: World -> World
-loadGame world = (World (saveBoard world) Black False Empty (board world))
-
 restartGame :: World -> World
-restartGame world = (World initBoard Black False Empty (saveBoard world))
+restartGame world = (World initBoard Black False Empty False)
 
 increaseBoardSize :: World -> World
-increaseBoardSize world |size (board world)< 19 = (World (Board (size (board world)+1) (target (board world)) []) Black False Empty (saveBoard world))
+increaseBoardSize world |size (board world)< 19 = (World (Board (size (board world)+1) (target (board world)) []) Black False Empty False)
                         |otherwise = world
 
 decreaseBoardSize :: World -> World
-decreaseBoardSize world |size (board world)> 6 = (World (Board (size (board world)-1) (target (board world)) []) Black False Empty (saveBoard world))
+decreaseBoardSize world |size (board world)> 6 = (World (Board (size (board world)-1) (target (board world)) []) Black False Empty False)
                         |otherwise = world
 
 
 increaseLineSize :: World -> World
-increaseLineSize world |target (board world) == 3 = (World (Board (size (board world)) (5) []) Black False Empty (saveBoard world))
+increaseLineSize world |target (board world) == 3 = (World (Board (size (board world)) (5) []) Black False Empty False)
                        |otherwise = world
 
 decreaseLineSize :: World -> World
-decreaseLineSize world |target (board world) == 5 = (World (Board (size (board world)) (3) []) Black False Empty (saveBoard world))
+decreaseLineSize world |target (board world) == 5 = (World (Board (size (board world)) (3) []) Black False Empty False)
                        |otherwise = world
 
 undoMove :: World -> World
 undoMove world = do
         let newBoard =  (Board (size (board world)) (target (board world)) (tail(tail(pieces (board world)))))
-        World (newBoard) (turn world) (won world) (winner world) (saveBoard world)
+        World (newBoard) (turn world) (won world) (winner world) False
 
 checkPositionOnBoard :: Board -> Position -> Bool
 checkPositionOnBoard board pos = elem pos piecesOnBoard

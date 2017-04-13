@@ -1,28 +1,49 @@
-module Draw(drawWorld, convertToColumnMultiRow, convertToColumnMultiColumn) where
+module Draw(drawWorld, convertToColumnMultiRow, convertToColumnMultiColumn,showHint) where
 
-import Graphics.Gloss
+--import Graphics.Gloss
+import Graphics.Gloss.Interface.IO.Game
 import Board
 import Data.Tuple.Select
 import Debug.Trace
+import AI
 
 -- Given a world state, return a Picture which will render the world state.
-drawWorld :: World -> Picture
-drawWorld w |(won w) == True && (winner w) == Black = Pictures[
-					printBoard w,
-					printButtons w,
-					Color violet (Translate (-170) 345 (rectangleSolid 100000 80)),
-					Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "Black Wins!")))
-					]
-	    |(won w) == True && (winner w) == White  = Pictures[
-					printBoard w,
-					printButtons w,
-					Color violet (Translate (-170) 345 (rectangleSolid 100000 80)),
-					Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "White Wins!")))
-					]
-	    |otherwise = Pictures[
+drawWorld :: World -> IO Picture
+drawWorld w |(won w) == True && (winner w) == Black = do return (Pictures[
+																																		printBoard w,
+																																		printButtons w,
+																																		Color violet (Translate (-170) 345 (rectangleSolid 100000 80)),
+																																		Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "Black Wins!")))
+																																		])
+	    |(won w) == True && (winner w) == White  = do return (Pictures[
+																															printBoard w,
+																															printButtons w,
+																															Color violet (Translate (-170) 345 (rectangleSolid 100000 80)),
+																															Color white (Translate (-170) 325 (Scale 0.5 0.5 (Text "White Wins!")))
+																															])
+	    |otherwise = do return (Pictures[
 											printBoard w,
 											printButtons w
+											])
+
+
+
+printHintButton :: Picture
+printHintButton = Pictures[
+											Color violet (Translate (400) (215) (rectangleSolid 60 55)),
+											Color white (Translate (377) (220) (Scale 0.15 0.15 (Text "Show"))),
+											Color white (Translate (381) (195) (Scale 0.15 0.15 (Text "Hint")))
 											]
+
+
+showHint :: World -> Picture
+showHint world = Pictures [
+										Color violet (Translate (400) (155) (rectangleSolid 60 30)),
+										Color white (Translate (377) (150) (Scale 0.15 0.15 (Text (show(getBestMoveForHint world)))))
+											]
+
+getBestMoveForHint :: World -> Position
+getBestMoveForHint world = (getBestMove 1 (buildTree (gen) (board world) (turn world)))
 
 printButtons :: World -> Picture
 printButtons w |length (pieces (board w)) >0 =  Pictures [
@@ -32,17 +53,31 @@ printButtons w |length (pieces (board w)) >0 =  Pictures [
 							 |otherwise = Pictures [printMostButtons w]
 
 printMostButtons :: World -> Picture
-printMostButtons w = Pictures [
-												printRestartButton,
-												printIncreaseBoardSizeButton,
-												printBoardSizeButton,
-												printDecreaseBoardSizeButton,
-												printIncreaseLineButton,
-												printLineSizeButton w,
-												printDecreaseLineButton,
-												printSaveButton,
-												printLoadButton
-												]
+printMostButtons w |hint w == True =  Pictures [
+																							printRestartButton,
+																							printIncreaseBoardSizeButton,
+																							printBoardSizeButton,
+																							printDecreaseBoardSizeButton,
+																							printIncreaseLineButton,
+																							printLineSizeButton w,
+																							printDecreaseLineButton,
+																							printSaveButton,
+																							printLoadButton,
+																							printHintButton,
+																							showHint w
+																							]
+									|otherwise = Pictures [
+																	printRestartButton,
+																	printIncreaseBoardSizeButton,
+																	printBoardSizeButton,
+																	printDecreaseBoardSizeButton,
+																	printIncreaseLineButton,
+																	printLineSizeButton w,
+																	printDecreaseLineButton,
+																	printSaveButton,
+																	printLoadButton,
+																	printHintButton
+																	]
 
 printRestartButton :: Picture
 printRestartButton = Pictures [
