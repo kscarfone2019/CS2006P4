@@ -1,3 +1,4 @@
+-- |Main. Where the game gets set up and played.
 module Main where
 
 import Graphics.Gloss
@@ -22,10 +23,11 @@ import AI
 -- and, if it is an AI's turn, should update the board with an AI generated
 -- move
 
+-- |The main function, the arguments are read in and used in the board, or a default board is used.
 main :: IO ()
 main = do
   args <- getArgs
-  let initBoard = if length args > 0 && ((read (head (tail args)) ::Int )== 3 || (read (head (tail args)) ::Int) == 5) && ((read (head args) ::Int)>5 && (read (head args) ::Int)<20)
+  let initBoard = if length args > 1 && ((read (head (tail args)) ::Int )== 3 || (read (head (tail args)) ::Int) == 5) && ((read (head args) ::Int)>5 && (read (head args) ::Int)<20)
                   then Board (read (head args) ::Int) (read (head (tail args)) ::Int) []
                   else Board 6 3 []
   let initWorld = World initBoard Black False Empty False

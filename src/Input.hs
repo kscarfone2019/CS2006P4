@@ -1,3 +1,4 @@
+-- |Input. Any user Input is handles is here.
 module Input(handleInput) where
 
 import Graphics.Gloss.Interface.Pure.Game
@@ -10,25 +11,10 @@ import Debug.Trace
 import Data.Maybe
 
 
-
-
-printSaveButton :: Picture
-printSaveButton = Pictures [
-													Color violet (Translate (-400) (-75) (rectangleSolid 60 50)),
-													Color white (Translate (-422) (-72) (Scale 0.15 0.15 (Text "Save"))),
-													Color white (Translate (-427) (-93) (Scale 0.15 0.15 (Text "Game")))
-													]
-
-printLoadButton :: Picture
-printLoadButton = Pictures [
-													Color violet (Translate (-400) (-150) (rectangleSolid 60 50)),
-													Color white (Translate (-422) (-148) (Scale 0.15 0.15 (Text "Load"))),
-													Color white (Translate (-427) (-168) (Scale 0.15 0.15 (Text "Game")))
-													]
-
--- Update the world state given an input event.
-handleInput :: Event -> World -> IO World
---handleInput (EventMotion (x, y)) world = trace ("Mouse moved to: " ++ show (x,y)) world
+-- |Update the world state given an input event.
+handleInput :: Event -- ^The event the player has made.
+											-> World -- ^The current world state.
+											-> IO World -- ^New updated IO World.
 handleInput (EventKey (MouseButton RightButton) Up m (x, y)) world | length (pieces (board world)) > 0 && (won world) == False = do return (undoMove world)
                                                                    | otherwise = do return (world)
 
@@ -47,9 +33,4 @@ handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world |(won world) =
 																																																																					return ((read(contents)))
 																																	|(won world) == False && x<(460) && x>(340) && y>(160) && y<(270) = do return (World (board world) (turn world) (won world) (winner world) True)
                                                                   |otherwise = do return (world)
-
-
-
---handleInput (EventKey (Char k) Down _ _) world = trace ("Key " ++ show k ++ " down") world
---handleInput (EventKey (Char k) Up _ _) world = trace ("Key " ++ show k ++ " up") world
 handleInput e world =  do return (world)

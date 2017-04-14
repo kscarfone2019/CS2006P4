@@ -1,101 +1,113 @@
+-- |Board. All actions to do with the board the player can do.
 module Board where
 
 import Data.Tuple.Select
 import Debug.Trace
 import Data.Maybe
 
+-- |Data type representing the 'turn'.
 data Col = Black | White | Empty
   deriving (Show, Eq, Read)
 
+-- |Function to swap the colour to the opposite.
 other :: Col -> Col
 other Black = White
 other White = Black
 
+-- |Type specifying what a Position is.
 type Position = (Int, Int)
 
-
--- A Board is a record containing the board size (a board is a square grid,
--- n * n), the number of pieces in a row required to win, and a list
--- of pairs of position and the colour at that position.  So a 10x10 board
--- for a game of 5 in a row with a black piece at 5,5 and a white piece at 8,7
--- would be represented as:
---
--- Board 10 5 [((5, 5), Black), ((8,7), White)]
-
-data Board = Board { size :: Int,
-                     target :: Int,
-                     pieces :: [(Position, Col)]
+-- |A Board is a record containing the board size (a board is a square grid, n * n), the number of pieces in a row required to win, and a list of pairs of position and the colour at that position.
+data Board = Board { size :: Int, -- ^ The size of the board.
+                     target :: Int, -- ^The target of pieces to get in a line.
+                     pieces :: [(Position, Col)] -- ^All the pieces on the board.
                    }
   deriving (Show, Eq, Read)
 
 initBoard = Board 6 3 []
 
--- Overall state is the board and whose turn it is, plus any further
--- information about the world (this may later include, for example, player
--- names, timers, information about rule variants, etc)
---
--- Feel free to extend this, and 'Board' above with anything you think
--- will be useful (information for the AI, for example, such as where the
--- most recent moves were).
-data World = World { board :: Board,
-                     turn :: Col,
-            		     won :: Bool,
-            		     winner :: Col,
-                     hint :: Bool}
+-- |Overall state is the board and whose turn it is, plus any further information about the world.
+data World = World { board :: Board, -- ^The board of the game.
+                     turn :: Col, -- ^Whos turn it currently is.
+            		     won :: Bool, -- ^If ther game has been won.
+            		     winner :: Col, -- ^Who the winner is.
+                     hint :: Bool} -- ^If a hint has been asked for.
     deriving(Show, Read)
 
--- Play a move on the board; return 'Nothing' if the move is invalid
--- (e.g. outside the range of the board, or there is a piece already there)
-makeMove :: Board -> Col -> Position -> Maybe Board
+-- |Play a move on the board; return 'Nothing' if the move is invalid (e.g. outside the range of the board, or there is a piece already there).
+makeMove :: Board -- ^The current Board.
+                  -> Col -- ^Who's turn it currently is.
+                  -> Position -- ^The Positon of the move the player wants to make.
+                  -> Maybe Board -- ^Either the updated Board or Nothing.
 makeMove board col pos |checkPositionForPiece pos board == False && checkPositionOnBoard board pos == True = Just (Board (size board) (target board) ([(pos, col)]++(pieces board)))
             		       |otherwise = Nothing
 
-restartGame :: World -> World
+-- |Restart and reset the game to its default settings.
+restartGame :: World -- ^The current World.
+                      -> World -- ^The newly reset world.
 restartGame world = (World initBoard Black False Empty False)
 
-increaseBoardSize :: World -> World
+-- |Incearse the number of squares on the game board.
+increaseBoardSize :: World -- ^The current World.
+                          -> World -- ^The newly increased size world.
 increaseBoardSize world |size (board world)< 19 = (World (Board (size (board world)+1) (target (board world)) []) Black False Empty False)
                         |otherwise = world
 
-decreaseBoardSize :: World -> World
+-- |Decrease the number of squares on the game board.
+decreaseBoardSize :: World -- ^The current World.
+                          -> World -- ^The newly decreased size world.
 decreaseBoardSize world |size (board world)> 6 = (World (Board (size (board world)-1) (target (board world)) []) Black False Empty False)
                         |otherwise = world
 
-
-increaseLineSize :: World -> World
+-- |Increase the target line length to get to win the game, onlt if the curretn line length is '3'.
+increaseLineSize :: World -- ^The current World.
+                          -> World -- ^The newly increased target world.
 increaseLineSize world |target (board world) == 3 = (World (Board (size (board world)) (5) []) Black False Empty False)
                        |otherwise = world
 
-decreaseLineSize :: World -> World
+-- |Decrease the target line length to get to win the game, onlt if the curretn line length is '5'.
+decreaseLineSize :: World -- ^The current World.
+                          -> World -- ^The newly decreased target world.
 decreaseLineSize world |target (board world) == 5 = (World (Board (size (board world)) (3) []) Black False Empty False)
                        |otherwise = world
 
-undoMove :: World -> World
+-- |Undo the players last move, this also undos the AI's most recent move.
+undoMove :: World -- ^The current World.
+                    -> World -- ^The world without the most two most recent moves.
 undoMove world = do
         let newBoard =  (Board (size (board world)) (target (board world)) (tail(tail(pieces (board world)))))
         World (newBoard) (turn world) (won world) (winner world) False
 
-checkPositionOnBoard :: Board -> Position -> Bool
+-- |Checks if a position is a valid position on the board.
+checkPositionOnBoard :: Board -- ^The game Board.
+                              -> Position -- ^The position being checked.
+                              -> Bool -- ^True or False for if it is a position on the board.
 checkPositionOnBoard board pos = elem pos piecesOnBoard
 		       where piecesOnBoard = (positions board)
 
-checkPositionForPiece :: Position -> Board -> Bool
+-- |Check if a Position passed in has a pice on it or not.
+checkPositionForPiece :: Position -- ^The Position being checked.
+                                  -> Board -- ^The current board.
+                                  -> Bool -- ^True or False if there is a piece or not.
 checkPositionForPiece pos board = elem pos (map (\ posi -> sel1  posi) piecesOnBoard)
 		          where piecesOnBoard = pieces board
 
-positions :: Board -> [(Int, Int)]
+-- |Generates a list of all the Positions for the baord.
+positions :: Board -- ^Current Board.
+                    -> [(Int, Int)] -- ^List of Popsitions on board.
 positions board = [(a, b) |a <- [1,2..(size board)], b <-[1,2..(size board)]]
 
-
-getPositionColor :: Board -> Position -> Col
+-- |If there is a piece on the position, it returns the colour of the piece.
+getPositionColor :: Board -- ^The current board.
+                          -> Position -- ^Tye position being checked.
+                          -> Col -- ^The colour of the piece, or 'Empty'
 getPositionColor board pos | checkPositionOnBoard board pos == True && checkPositionForPiece pos board == True = sel2 (head[x | x <- pieces board, sel1 x == pos])
 			                     | otherwise = Empty
 
 
--- Check whether the board is in a winning state for either player.
--- Returns 'Nothing' if neither player has won yet
--- Returns 'Just c' if the player 'c' has won
-checkWon :: Board -> Maybe Col
+-- |Check whether the board is in a winning state for either player.
+checkWon :: Board -- ^The current board.
+                    -> Maybe Col -- ^Returns 'Nothing' if neither player has won yet. Returns 'Just c' if the player 'c' has won.
 checkWon board |checkEast board (sel1 (head (pieces board))) (getPositionColor board (sel1 (head (pieces board)))) (target board) == True = Just (getPositionColor board (sel1 (head (pieces board))))
                |checkWest board (sel1 (head (pieces board))) (getPositionColor board (sel1 (head (pieces board)))) (target board) == True = Just (getPositionColor board (sel1 (head (pieces board))))
                |checkMiddleRow board (sel1 (head (pieces board))) (getPositionColor board (sel1 (head (pieces board)))) (target board) == True = Just (getPositionColor board (sel1 (head (pieces board))))
@@ -110,7 +122,12 @@ checkWon board |checkEast board (sel1 (head (pieces board))) (getPositionColor b
                |checkMiddleDiagonalTwo board (sel1 (head (pieces board))) (getPositionColor board (sel1 (head (pieces board)))) (target board) == True = Just (getPositionColor board (sel1 (head (pieces board))))
 	             |otherwise = Nothing
 
-checkEast :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the East direction for the target length of lines.
+checkEast :: Board -- ^The current board.
+                    -> Position -- ^The last move made onto the board.
+                    -> Col -- ^The colour of the last move made on the board.
+                    -> Int -- ^The target length.
+                    -> Bool -- ^True if a line has been found, otherwise false.
 checkEast board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +2, sel2 pos) == True && checkPositionForPiece (sel1 pos +2, sel2 pos) board == True && getPositionColor board (sel1 pos +2, sel2 pos) == col = False
                                |target == 3 && checkPositionOnBoard board (sel1 pos +3, sel2 pos) == True && checkPositionForPiece (sel1 pos +3, sel2 pos) board == True && getPositionColor board (sel1 pos +3, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +2, sel2 pos) == True && checkPositionForPiece (sel1 pos +2, sel2 pos) board == True && getPositionColor board (sel1 pos +2, sel2 pos) == col = False
                                |target == 3 && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +2, sel2 pos) == True && checkPositionForPiece (sel1 pos +2, sel2 pos) board == True && getPositionColor board (sel1 pos +2, sel2 pos) == col = True
@@ -121,7 +138,12 @@ checkEast board pos col target |target == 3 && checkPositionOnBoard board (sel1 
                                |target == 5 && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +2, sel2 pos) == True && checkPositionForPiece (sel1 pos +2, sel2 pos) board == True && getPositionColor board (sel1 pos +2, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +3, sel2 pos) == True && checkPositionForPiece (sel1 pos +3, sel2 pos) board == True && getPositionColor board (sel1 pos +3, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col = True
                                |otherwise = False
 
-checkWest :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the West direction for the target length of lines.
+checkWest ::  Board -- ^The current board.
+                    -> Position -- ^The last move made onto the board.
+                    -> Col -- ^The colour of the last move made on the board.
+                    -> Int -- ^The target length.
+                    -> Bool -- ^True if a line has been found, otherwise false.
 checkWest board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos -3, sel2 pos) == True && checkPositionForPiece (sel1 pos -3, sel2 pos) board == True && getPositionColor board (sel1 pos -3, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -2, sel2 pos) == True && checkPositionForPiece (sel1 pos -2, sel2 pos) board == True && getPositionColor board (sel1 pos -2, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col = False
                                |target == 3 && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -2, sel2 pos) == True && checkPositionForPiece (sel1 pos -2, sel2 pos) board == True && getPositionColor board (sel1 pos -2, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col = False
                                |target == 3 && checkPositionOnBoard board (sel1 pos -2, sel2 pos) == True && checkPositionForPiece (sel1 pos -2, sel2 pos) board == True && getPositionColor board (sel1 pos -2, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col = True
@@ -132,7 +154,12 @@ checkWest board pos col target |target == 3 && checkPositionOnBoard board (sel1 
                                |target == 5 && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -3, sel2 pos) == True && checkPositionForPiece (sel1 pos -3, sel2 pos) board == True && getPositionColor board (sel1 pos -3, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -2, sel2 pos) == True && checkPositionForPiece (sel1 pos -2, sel2 pos) board == True && getPositionColor board (sel1 pos -2, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col = True
                                |otherwise = False
 
-checkMiddleRow :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the Middle Horizontal position for the target length of lines.
+checkMiddleRow ::  Board -- ^The current board.
+                    -> Position -- ^The last move made onto the board.
+                    -> Col -- ^The colour of the last move made on the board.
+                    -> Int -- ^The target length.
+                    -> Bool -- ^True if a line has been found, otherwise false.
 checkMiddleRow board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos -2, sel2 pos) == True && checkPositionForPiece (sel1 pos -2, sel2 pos) board == True && getPositionColor board (sel1 pos -2, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos +2, sel2 pos) == True && checkPositionForPiece (sel1 pos +2, sel2 pos) board == True && getPositionColor board (sel1 pos +2, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col = True
@@ -141,7 +168,12 @@ checkMiddleRow board pos col target |target == 3 && checkPositionOnBoard board (
                                     |target == 5 && checkPositionOnBoard board (sel1 pos +2, sel2 pos) == True && checkPositionForPiece (sel1 pos +2, sel2 pos) board == True && getPositionColor board (sel1 pos +2, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -1, sel2 pos) == True && checkPositionForPiece (sel1 pos -1, sel2 pos) board == True && getPositionColor board (sel1 pos -1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos +1, sel2 pos) == True && checkPositionForPiece (sel1 pos +1, sel2 pos) board == True && getPositionColor board (sel1 pos +1, sel2 pos) == col && checkPositionOnBoard board (sel1 pos -2, sel2 pos) == True && checkPositionForPiece (sel1 pos -2, sel2 pos) board == True && getPositionColor board (sel1 pos -2, sel2 pos) == col = True
                                     |otherwise = False
 
-checkNorth :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the North direction for the target length of lines.
+checkNorth ::  Board -- ^The current board.
+                    -> Position -- ^The last move made onto the board.
+                    -> Col -- ^The colour of the last move made on the board.
+                    -> Int -- ^The target length.
+                    -> Bool -- ^True if a line has been found, otherwise false.
 checkNorth board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos, sel2 pos -3) == True && checkPositionForPiece (sel1 pos, sel2 pos -3) board == True && getPositionColor board (sel1 pos, sel2 pos -3) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -2) == True && checkPositionForPiece (sel1 pos, sel2 pos -2) board == True && getPositionColor board (sel1 pos, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -1) == True && checkPositionForPiece (sel1 pos, sel2 pos -1) board == True && getPositionColor board (sel1 pos, sel2 pos -1) == col = False
                                 |target == 3 && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -2) == True && checkPositionForPiece (sel1 pos, sel2 pos -2) board == True && getPositionColor board (sel1 pos, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -1) == True && checkPositionForPiece (sel1 pos, sel2 pos -1) board == True && getPositionColor board (sel1 pos, sel2 pos -1) == col = False
                                 |target == 3 && checkPositionOnBoard board (sel1 pos, sel2 pos -2) == True && checkPositionForPiece (sel1 pos, sel2 pos -2) board == True && getPositionColor board (sel1 pos, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -1) == True && checkPositionForPiece (sel1 pos, sel2 pos -1) board == True && getPositionColor board (sel1 pos, sel2 pos -1) == col = True
@@ -152,7 +184,12 @@ checkNorth board pos col target |target == 3 && checkPositionOnBoard board (sel1
                                 |target == 5 && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +2) == True && checkPositionForPiece (sel1 pos, sel2 pos +2) board == True && getPositionColor board (sel1 pos, sel2 pos +2) == col && checkPositionOnBoard board (sel1 pos, sel2 pos+3) == True && checkPositionForPiece (sel1 pos, sel2 pos+3) board == True && getPositionColor board (sel1 pos, sel2 pos+3) == col && checkPositionOnBoard board (sel1 pos, sel2 pos-1) == True && checkPositionForPiece (sel1 pos, sel2 pos-1) board == True && getPositionColor board (sel1 pos, sel2 pos-1) == col = True
                                 |otherwise = False
 
-checkSouth :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the South direction for the target length of lines.
+checkSouth ::  Board -- ^The current board.
+                    -> Position -- ^The last move made onto the board.
+                    -> Col -- ^The colour of the last move made on the board.
+                    -> Int -- ^The target length.
+                    -> Bool -- ^True if a line has been found, otherwise false.
 checkSouth board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos, sel2 pos +3) == True && checkPositionForPiece (sel1 pos, sel2 pos +3) board == True && getPositionColor board (sel1 pos, sel2 pos +3) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +2) == True && checkPositionForPiece (sel1 pos, sel2 pos +2) board == True && getPositionColor board (sel1 pos, sel2 pos +2) == col = False
                                 |target == 3 && checkPositionOnBoard board (sel1 pos, sel2 pos -1) == True && checkPositionForPiece (sel1 pos, sel2 pos -1) board == True && getPositionColor board (sel1 pos, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +2) == True && checkPositionForPiece (sel1 pos, sel2 pos +2) board == True && getPositionColor board (sel1 pos, sel2 pos +2) == col = False
                                 |target == 3 && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +2) == True && checkPositionForPiece (sel1 pos, sel2 pos +2) board == True && getPositionColor board (sel1 pos, sel2 pos +2) == col = True
@@ -163,7 +200,12 @@ checkSouth board pos col target |target == 3 && checkPositionOnBoard board (sel1
                                 |target == 5 && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -3) == True && checkPositionForPiece (sel1 pos, sel2 pos -3) board == True && getPositionColor board (sel1 pos, sel2 pos -3) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -2) == True && checkPositionForPiece (sel1 pos, sel2 pos -2) board == True && getPositionColor board (sel1 pos, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -1) == True && checkPositionForPiece (sel1 pos, sel2 pos -1) board == True && getPositionColor board (sel1 pos, sel2 pos -1) == col = True
                                 |otherwise = False
 
-checkMiddleColumn :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the Middle Vertical position for the target length of lines.
+checkMiddleColumn ::  Board -- ^The current board.
+                            -> Position -- ^The last move made onto the board.
+                            -> Col -- ^The colour of the last move made on the board.
+                            -> Int -- ^The target length.
+                            -> Bool -- ^True if a line has been found, otherwise false.
 checkMiddleColumn board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos, sel2 pos -2) == True && checkPositionForPiece (sel1 pos, sel2 pos -2) board == True && getPositionColor board (sel1 pos, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -1) == True && checkPositionForPiece (sel1 pos, sel2 pos -1) board == True && getPositionColor board (sel1 pos, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col = False
                                        |target == 3 && checkPositionOnBoard board (sel1 pos, sel2 pos +2) == True && checkPositionForPiece (sel1 pos, sel2 pos +2) board == True && getPositionColor board (sel1 pos, sel2 pos +2) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -1) == True && checkPositionForPiece (sel1 pos, sel2 pos -1) board == True && getPositionColor board (sel1 pos, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col = False
                                        |target == 3 && checkPositionOnBoard board (sel1 pos, sel2 pos -1) == True && checkPositionForPiece (sel1 pos, sel2 pos -1) board == True && getPositionColor board (sel1 pos, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col = True
@@ -172,7 +214,12 @@ checkMiddleColumn board pos col target |target == 3 && checkPositionOnBoard boar
                                        |target == 5 && checkPositionOnBoard board (sel1 pos, sel2 pos +2) == True && checkPositionForPiece (sel1 pos, sel2 pos +2) board == True && getPositionColor board (sel1 pos, sel2 pos +2) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -1) == True && checkPositionForPiece (sel1 pos, sel2 pos -1) board == True && getPositionColor board (sel1 pos, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos +1) == True && checkPositionForPiece (sel1 pos, sel2 pos +1) board == True && getPositionColor board (sel1 pos, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos, sel2 pos -2) == True && checkPositionForPiece (sel1 pos, sel2 pos -2) board == True && getPositionColor board (sel1 pos, sel2 pos -2) == col = True
                                        |otherwise = False
 
-checkNorthEast :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the North East direction for the target length of lines.
+checkNorthEast ::  Board -- ^The current board.
+                          -> Position -- ^The last move made onto the board.
+                          -> Col -- ^The colour of the last move made on the board.
+                          -> Int -- ^The target length.
+                          -> Bool -- ^True if a line has been found, otherwise false.
 checkNorthEast board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos+3, sel2 pos -3) == True && checkPositionForPiece (sel1 pos+3, sel2 pos -3) board == True && getPositionColor board (sel1 pos+3, sel2 pos -3) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos+2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos -2) board == True && getPositionColor board (sel1 pos+2, sel2 pos -2) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos+2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos -2) board == True && getPositionColor board (sel1 pos+2, sel2 pos -2) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos+2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos -2) board == True && getPositionColor board (sel1 pos+2, sel2 pos -2) == col = True
@@ -183,7 +230,12 @@ checkNorthEast board pos col target |target == 3 && checkPositionOnBoard board (
                                     |target == 5 && checkPositionOnBoard board (sel1 pos+3, sel2 pos -3) == True && checkPositionForPiece (sel1 pos+3, sel2 pos -3) board == True && getPositionColor board (sel1 pos+3, sel2 pos -3) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos+2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos -2) board == True && getPositionColor board (sel1 pos+2, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col = True
                                     |otherwise = False
 
-checkSouthWest :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the South West direction for the target length of lines.
+checkSouthWest ::  Board -- ^The current board.
+                          -> Position -- ^The last move made onto the board.
+                          -> Col -- ^The colour of the last move made on the board.
+                          -> Int -- ^The target length.
+                          -> Bool -- ^True if a line has been found, otherwise false.
 checkSouthWest board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos-3, sel2 pos +3) == True && checkPositionForPiece (sel1 pos-3, sel2 pos +3) board == True && getPositionColor board (sel1 pos-3, sel2 pos +3) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos +2) board == True && getPositionColor board (sel1 pos-2, sel2 pos +2) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos +2) board == True && getPositionColor board (sel1 pos-2, sel2 pos +2) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos +2) board == True && getPositionColor board (sel1 pos-2, sel2 pos +2) == col = True
@@ -194,7 +246,12 @@ checkSouthWest board pos col target |target == 3 && checkPositionOnBoard board (
                                     |target == 5 && checkPositionOnBoard board (sel1 pos-3, sel2 pos +3) == True && checkPositionForPiece (sel1 pos-3, sel2 pos +3) board == True && getPositionColor board (sel1 pos-3, sel2 pos +3) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos +2) board == True && getPositionColor board (sel1 pos-2, sel2 pos +2) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col = True
                                     |otherwise = False
 
-checkNorthWest :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the North West direction for the target length of lines.
+checkNorthWest ::  Board -- ^The current board.
+                          -> Position -- ^The last move made onto the board.
+                          -> Col -- ^The colour of the last move made on the board.
+                          -> Int -- ^The target length.
+                          -> Bool -- ^True if a line has been found, otherwise false.
 checkNorthWest board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos-3, sel2 pos -3) == True && checkPositionForPiece (sel1 pos-3, sel2 pos -3) board == True && getPositionColor board (sel1 pos-3, sel2 pos -3) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos -2) board == True && getPositionColor board (sel1 pos-2, sel2 pos -2) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos -2) board == True && getPositionColor board (sel1 pos-2, sel2 pos -2) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos -2) board == True && getPositionColor board (sel1 pos-2, sel2 pos -2) == col = True
@@ -205,7 +262,12 @@ checkNorthWest board pos col target |target == 3 && checkPositionOnBoard board (
                                     |target == 5 && checkPositionOnBoard board (sel1 pos-3, sel2 pos -3) == True && checkPositionForPiece (sel1 pos-3, sel2 pos -3) board == True && getPositionColor board (sel1 pos-3, sel2 pos -3) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos -2) board == True && getPositionColor board (sel1 pos-2, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col = True
       		                          |otherwise = False
 
-checkSouthEast :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the South East direction for the target length of lines.
+checkSouthEast ::  Board -- ^The current board.
+                        -> Position -- ^The last move made onto the board.
+                        -> Col -- ^The colour of the last move made on the board.
+                        -> Int -- ^The target length.
+                        -> Bool -- ^True if a line has been found, otherwise false.
 checkSouthEast board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos+3, sel2 pos +3) == True && checkPositionForPiece (sel1 pos+3, sel2 pos +3) board == True && getPositionColor board (sel1 pos+3, sel2 pos +3) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos+2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos +2) board == True && getPositionColor board (sel1 pos+2, sel2 pos +2) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos+2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos +2) board == True && getPositionColor board (sel1 pos+2, sel2 pos +2) == col = False
                                     |target == 3 && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos+2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos +2) board == True && getPositionColor board (sel1 pos+2, sel2 pos +2) == col = True
@@ -216,7 +278,12 @@ checkSouthEast board pos col target |target == 3 && checkPositionOnBoard board (
                                     |target == 5 && checkPositionOnBoard board (sel1 pos+3, sel2 pos +3) == True && checkPositionForPiece (sel1 pos+3, sel2 pos +3) board == True && getPositionColor board (sel1 pos+3, sel2 pos +3) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos+2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos +2) board == True && getPositionColor board (sel1 pos+2, sel2 pos +2) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col = True
                                     |otherwise = False
 
-checkMiddleDiagonalOne :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the Middle Diagonal Position for the target length of lines.
+checkMiddleDiagonalOne ::  Board -- ^The current board.
+                                  -> Position -- ^The last move made onto the board.
+                                  -> Col -- ^The colour of the last move made on the board.
+                                  -> Int -- ^The target length.
+                                  -> Bool -- ^True if a line has been found, otherwise false.
 checkMiddleDiagonalOne board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos+2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos +2) board == True && getPositionColor board (sel1 pos+2, sel2 pos +2) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col = False
                                             |target == 3 && checkPositionOnBoard board (sel1 pos-2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos -2) board == True && getPositionColor board (sel1 pos-2, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col = False
                                             |target == 3 && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col = True
@@ -225,7 +292,12 @@ checkMiddleDiagonalOne board pos col target |target == 3 && checkPositionOnBoard
                                             |target == 5 && checkPositionOnBoard board (sel1 pos+2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos +2) board == True && getPositionColor board (sel1 pos+2, sel2 pos +2) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos +1) board == True && getPositionColor board (sel1 pos+1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos -1) board == True && getPositionColor board (sel1 pos-1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos -2) board == True && getPositionColor board (sel1 pos-2, sel2 pos -2) == col = True
                                             |otherwise = False
 
-checkMiddleDiagonalTwo :: Board -> Position -> Col -> Int -> Bool
+-- |Checks in the other Middle Diagonal Position for the target length of lines.
+checkMiddleDiagonalTwo ::  Board -- ^The current board.
+                                -> Position -- ^The last move made onto the board.
+                                -> Col -- ^The colour of the last move made on the board.
+                                -> Int -- ^The target length.
+                                -> Bool -- ^True if a line has been found, otherwise false.
 checkMiddleDiagonalTwo board pos col target |target == 3 && checkPositionOnBoard board (sel1 pos+2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos -2) board == True && getPositionColor board (sel1 pos+2, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col = False
                                             |target == 3 && checkPositionOnBoard board (sel1 pos-2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos +2) board == True && getPositionColor board (sel1 pos-2, sel2 pos +2) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col = False
                                             |target == 3 && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col = True
@@ -234,68 +306,115 @@ checkMiddleDiagonalTwo board pos col target |target == 3 && checkPositionOnBoard
                                             |target == 5 && checkPositionOnBoard board (sel1 pos+2, sel2 pos -2) == True && checkPositionForPiece (sel1 pos+2, sel2 pos -2) board == True && getPositionColor board (sel1 pos+2, sel2 pos -2) == col && checkPositionOnBoard board (sel1 pos+1, sel2 pos -1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos -1) board == True && getPositionColor board (sel1 pos+1, sel2 pos -1) == col && checkPositionOnBoard board (sel1 pos-1, sel2 pos +1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos +1) board == True && getPositionColor board (sel1 pos-1, sel2 pos +1) == col && checkPositionOnBoard board (sel1 pos-2, sel2 pos +2) == True && checkPositionForPiece (sel1 pos-2, sel2 pos +2) board == True && getPositionColor board (sel1 pos-2, sel2 pos +2) == col = True
                                             |otherwise = False
 
--- An evaluation function for a minimax search. Given a board and a colour
--- return an integer indicating how good the board is for that colour.
-
---let fil x = checkPositionForPiece x board == False in filter fil possiblePositions
-
-checkAbove :: Position -> Col -> Board -> Bool
+-- |Checking if there are two pieces in a line North of the Piece.
+checkAbove :: Position -- ^The last move made on the board.
+                        -> Col -- ^The colour of the last move made.
+                        -> Board -- ^The current board.
+                        -> Bool -- ^True if two are found, otherwise False.
 checkAbove pos col board | checkPositionOnBoard board (sel1 pos-1, sel2 pos) == True && checkPositionForPiece (sel1 pos-1, sel2 pos) board == True && getPositionColor board (sel1 pos-1, sel2 pos) == col = True
                    |otherwise = False
 
-checkBelow :: Position -> Col -> Board ->  Bool
+-- |Checking if there are two pieces in a line South of the Piece.
+checkBelow :: Position -- ^The last move made on the board.
+                        -> Col -- ^The colour of the last move made.
+                        -> Board -- ^The current board.
+                        -> Bool -- ^True if two are found, otherwise False.
 checkBelow pos col board | checkPositionOnBoard board (sel1 pos+1, sel2 pos) == True && checkPositionForPiece (sel1 pos+1, sel2 pos) board == True && getPositionColor board (sel1 pos+1, sel2 pos) == col = True
                    |otherwise = False
 
-checkLeft :: Position -> Col ->Board ->  Bool
+-- |Checking if there are two pieces in a line West of the Piece.
+checkLeft :: Position -- ^The last move made on the board.
+                        -> Col -- ^The colour of the last move made.
+                        -> Board -- ^The current board.
+                        -> Bool -- ^True if two are found, otherwise False.
 checkLeft pos col board | checkPositionOnBoard board (sel1 pos, sel2 pos-1) == True && checkPositionForPiece (sel1 pos, sel2 pos-1) board == True && getPositionColor board (sel1 pos, sel2 pos-1) == col = True
                   |otherwise = False
 
-checkRight :: Position -> Col -> Board ->  Bool
+-- |Checking if there are two pieces in a line East of the Piece.
+checkRight :: Position -- ^The last move made on the board.
+                        -> Col -- ^The colour of the last move made.
+                        -> Board -- ^The current board.
+                        -> Bool -- ^True if two are found, otherwise False.
 checkRight pos col board | checkPositionOnBoard board (sel1 pos, sel2 pos+1) == True && checkPositionForPiece (sel1 pos, sel2 pos+1) board == True && getPositionColor board (sel1 pos, sel2 pos+1) == col = True
                    |otherwise = False
 
-checkUpperLeft :: Position -> Col -> Board ->  Bool
+-- |Checking if there are two pieces in a line North West of the Piece.
+checkUpperLeft :: Position -- ^The last move made on the board.
+                        -> Col -- ^The colour of the last move made.
+                        -> Board -- ^The current board.
+                        -> Bool -- ^True if two are found, otherwise False.
 checkUpperLeft pos col board | checkPositionOnBoard board (sel1 pos-1, sel2 pos-1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos-1) board == True && getPositionColor board (sel1 pos-1, sel2 pos-1) == col = True
                   |otherwise = False
 
-checkUpperRight:: Position -> Col -> Board ->  Bool
+-- |Checking if there are two pieces in a line North East of the Piece.
+checkUpperRight:: Position -- ^The last move made on the board.
+                        -> Col -- ^The colour of the last move made.
+                        -> Board -- ^The current board.
+                        -> Bool -- ^True if two are found, otherwise False.
 checkUpperRight pos col board | checkPositionOnBoard board (sel1 pos-1, sel2 pos+1) == True && checkPositionForPiece (sel1 pos-1, sel2 pos+1) board == True && getPositionColor board (sel1 pos-1, sel2 pos+1) == col = True
                    |otherwise = False
 
-checkLowerLeft :: Position -> Col -> Board ->  Bool
+-- |Checking if there are two pieces in a line South West of the Piece.
+checkLowerLeft :: Position -- ^The last move made on the board.
+                        -> Col -- ^The colour of the last move made.
+                        -> Board -- ^The current board.
+                        -> Bool -- ^True if two are found, otherwise False.
 checkLowerLeft pos col board | checkPositionOnBoard board (sel1 pos+1, sel2 pos-1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos-1) board == True && getPositionColor board (sel1 pos+1, sel2 pos-1) == col = True
                   |otherwise = False
 
-checkLowerRight :: Position -> Col -> Board ->  Bool
+-- |Checking if there are two pieces in a line South East of the Piece.
+checkLowerRight :: Position -- ^The last move made on the board.
+                        -> Col -- ^The colour of the last move made.
+                        -> Board -- ^The current board.
+                        -> Bool -- ^True if two are found, otherwise False.
 checkLowerRight pos col board | checkPositionOnBoard board (sel1 pos+1, sel2 pos+1) == True && checkPositionForPiece (sel1 pos+1, sel2 pos+1) board == True && getPositionColor board (sel1 pos+1, sel2 pos+1) == col = True
                  |otherwise = False
 
-checkWhatColor :: (Position, Col) -> Board -> Col -> Bool
+-- |Compares the colour of a piece to that of the colour passed in.
+checkWhatColor :: (Position, Col) -- ^The Position and colour of the piece at that position.
+                                  -> Board -- ^The current board.
+                                  -> Col -- ^The colour being compared against.
+                                  -> Bool -- ^True or False if the colours are the same.
 checkWhatColor pos board col | getPositionColor board (sel1 pos) == col = True
                              |otherwise = False
 
-checkForTwoInARow :: [(Position, Col)] -> Col -> Board -> Bool
+-- |Function for checking if there are two pieces of the same colour next to each other.
+checkForTwoInARow :: [(Position, Col)] -- ^A list of all the pieces and colours of those pieces.
+                                      -> Col -- ^Whos turn it is.
+                                      -> Board -- ^The current board.
+                                      -> Bool -- ^True if any two pieces are found next to each other.
 checkForTwoInARow pieces col board | length (let fil x = checkAbove (sel1 x) col board == True || checkBelow (sel1 x) col board == True || checkRight (sel1 x) col board == True || checkLeft (sel1 x) col board == True|| checkUpperLeft (sel1 x) col board == True|| checkLowerLeft (sel1 x) col board == True|| checkUpperRight (sel1 x) col board == True|| checkLowerRight (sel1 x) col board == True in filter fil pieces) == (length pieces) = True
                              |otherwise = False
 
-checkForThreeInARow :: [(Position, Col)] -> Col -> Board -> Bool
+-- |Function for checking if there are is the target amount of pieces of the same colour next to each other.
+checkForThreeInARow :: [(Position, Col)] -- ^A list of all the pieces and colours of those pieces.
+                                      -> Col -- ^Whos turn it is.
+                                      -> Board -- ^The current board.
+                                      -> Bool -- ^True if any two pieces are found next to each other.
 checkForThreeInARow pieces col board | length (let fil x = checkEast board (sel1 x) col (target board) == True || checkWest board (sel1 x) col (target board) == True || checkMiddleRow board (sel1 x) col (target board) == True || checkNorth board (sel1 x) col (target board) == True|| checkSouth board (sel1 x) col (target board) == True|| checkMiddleColumn board (sel1 x) col (target board) == True|| checkNorthEast board (sel1 x) col (target board) == True|| checkSouthWest board (sel1 x) col (target board) == True || checkNorthWest board (sel1 x) col (target board) == True || checkSouthEast board (sel1 x) col (target board) == True || checkMiddleDiagonalOne board (sel1 x) col (target board) == True || checkMiddleDiagonalTwo board (sel1 x) col (target board) == True in filter fil pieces) > 0 = True
                             |otherwise = False
 
-
-checkForDefence :: (Position, Col) -> Col -> Board -> Bool
+-- |Function for seeing if the oppisite colour is one away from getting the target length of pieces in a line.
+checkForDefence :: (Position, Col) -- ^The last move made on the board, the move played by the opposite colour.
+                                  -> Col -- ^The current colour of whose turn it is.
+                                  -> Board -- ^The current board.
+                                  -> Bool -- ^True if the player is one away from winning, otherwise false.
 checkForDefence piece col board |checkEast board (sel1 piece) (other col) (target board) == True || checkWest board (sel1 piece) (other col) (target board) == True || checkMiddleRow board (sel1 piece) (other col) (target board) == True || checkNorth board (sel1 piece) (other col) (target board) == True|| checkSouth board (sel1 piece) (other col) (target board) == True|| checkMiddleColumn board (sel1 piece) (other col) (target board) == True|| checkNorthEast board (sel1 piece) (other col) (target board) == True|| checkSouthWest board (sel1 piece) (other col) (target board) == True || checkNorthWest board (sel1 piece) (other col) (target board) == True || checkSouthEast board (sel1 piece) (other col) (target board) == True || checkMiddleDiagonalOne board (sel1 piece) (other col) (target board) == True || checkMiddleDiagonalTwo board (sel1 piece) (other col) (target board) == True = True
                                 |otherwise = False
 
-
-getPiecesForColor :: Board -> Col -> [(Position, Col)]
+-- |Gets all the Positions on the board where the specified colour has pieces.
+getPiecesForColor :: Board -- ^The current board.
+                            -> Col -- ^The colour to search for.
+                            -> [(Position, Col)] -- ^List of Positions and Colour.
 getPiecesForColor board col = let fil x = checkWhatColor x board col == True in filter fil (pieces board)
 
 --if there are 3 in a row then return 3
 --if there are 2 in a row then return 2
 --otherwise return 1
-evaluate :: Board -> Col -> Int
+-- |Evaluate how good the board is for the specified colour.
+evaluate :: Board -- ^The current board.
+                  -> Col -- ^The colour to evaluate for.
+                  -> Int -- ^If there is a winning line then 5, if it stops the other colour from winner it gets 4, if there are two pieces in a row of the same colour then 2, otherwise 1.
 evaluate board col | checkForThreeInARow (getPiecesForColor board col) col board == True = 5
                    | checkForDefence ((pieces board) !! 0) col board == True = 4
                    | checkForTwoInARow (getPiecesForColor board col) col board == True = 2

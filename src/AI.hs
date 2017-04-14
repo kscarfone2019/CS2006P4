@@ -1,41 +1,40 @@
+-- |AI. Everything to do with the AI gets done in here.
 module AI where
 
 import Board
-
 import Debug.Trace
 import Data.Maybe
 import Data.Tuple.Select
 import Data.List
 import Data.Ord
 
-data GameTree = GameTree { game_board :: Board,
-                           game_turn :: Col,
-                           next_moves :: [(Position, GameTree)] }
+-- |Data tpye for game-tress.
+data GameTree = GameTree { game_board :: Board, -- ^The board at the level.
+                           game_turn :: Col, -- ^Whos turn it is.
+                           next_moves :: [(Position, GameTree)] -- ^The next possible moves for this colour, and the trees that they produce.
+                         }
 
-possiblePositions :: Board -> [(Int, Int)]
+-- |Get all the possible positions on the board.
+possiblePositions :: Board -- ^The board.
+                            -> [(Int, Int)] -- ^List of all positions.
 possiblePositions board = [(a, b) |a <- [1,2..(size board)], b <-[1,2..(size board)]]
 
-spaces :: Board -> [Position]
+-- |Gets all the empty positions on the board.
+spaces :: Board -- ^The current board.
+                -> [Position] -- ^List of empty positions.
 spaces board = let fil x = checkPositionForPiece x board == False in filter fil (possiblePositions board)
 
-gen :: Board -> Col -> [Position]
+-- |Generate List of Positions.
+gen :: Board -- ^The current board.
+            -> Col -- ^The colour of whose turn it is.
+            -> [Position] -- ^List of free Positions.
 gen board col = spaces board
 
--- Given a function to generate plausible moves (i.e. board positions)
--- for a player (Col) on a particular board, generate a (potentially)
--- infinite game tree.
---
--- (It's not actually infinite since the board is finite, but it's sufficiently
--- big that you might as well consider it infinite!)
---
--- An important part of the AI is the 'gen' function you pass in here.
--- Rather than generating every possible move (which would result in an
--- unmanageably large game tree!) it could, for example, generate moves
--- according to various simpler strategies.
-buildTree :: (Board -> Col -> [Position]) -- ^ Move generator
-             -> Board -- ^ board state
-             -> Col -- ^ player to play next
-             -> GameTree
+-- |Given a function to generate plausible moves (i.e. board positions) for a player (Col) on a particular board, generate a (potentially) infinite game tree.
+buildTree :: (Board -> Col -> [Position]) -- ^ Move generator.
+             -> Board -- ^ board state.
+             -> Col -- ^ player to play next.
+             -> GameTree -- ^resulting game tree.
 buildTree gen b c = let moves = gen b c in -- generated moves
                         GameTree b c (mkNextStates moves)
   where
@@ -48,56 +47,40 @@ buildTree gen b c = let moves = gen b c in -- generated moves
                              -- successful, make move and build tree from
                              -- here for opposite player
 
-
-
-addMovesToList :: GameTree -> [(Int, Position)] -> [(Int,Position)]
+-- |Add moves to the current list of possible moves that have been evaluated.
+addMovesToList :: GameTree -- ^The game tree with the boards possible moves.
+                          -> [(Int, Position)] -- ^The current list of moves.
+                          -> [(Int,Position)] -- ^The appended list of moves.
 addMovesToList tree moves = moves ++ [((evaluate (game_board (sel2 x)) (game_turn tree)), sel1 x) | x <- (next_moves tree)]
 
-treeTraverse :: Int -> Int -> [(Int,Position)] -> GameTree -> [(Int,Position)]
+-- |Going through teh tree and returning a list of evaluated moves.
+treeTraverse :: Int -- ^The maximum depth to traverse the tree.
+                    -> Int -- ^The current depth.
+                    -> [(Int,Position)] -- ^The list of possible moves.
+                    -> GameTree -- ^The current Game-tree.
+                    -> [(Int,Position)] -- ^The list of evaluated moves.
 treeTraverse maxDepth depth moves tree |depth == 1 =(treeTraverse maxDepth 2 (addMovesToList tree moves) (sel2(head (next_moves tree))) )++ (treeTraverse maxDepth 2  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)) )
                                     --  |depth == 2 = (treeTraverse 3 moves (sel2(head (next_moves tree))) ++ treeTraverse 3 moves (sel2((next_moves tree)!! 1)))
                                     --  |depth == 3 = trace ("depth 3") (treeTraverse 4  (addMovesToList tree moves) (sel2 (head (next_moves tree)))) ++ (treeTraverse 4  (addMovesToList tree moves) (sel2 ((next_moves tree)!!1)))
                                        |otherwise = moves
 
--- Get the best next move from a (possibly infinite) game tree. This should
--- traverse the game tree up to a certain depth, and pick the move which
--- leads to the position with the best score for the player whose turn it
--- is at the top of the game tree.
-getBestMove :: Int -- ^ Maximum search depth
-               -> GameTree -- ^ Initial game tree
-               -> Position
+-- |Get the best next move from a (possibly infinite) game tree.
+getBestMove :: Int -- ^ Maximum search depth.
+               -> GameTree -- ^ Initial game tree.
+               -> Position -- ^The best moves available.
 getBestMove depth tree |length (next_moves tree) > 1 = sel2(maximumFromList (treeTraverse depth 1 [] tree))
             		       |otherwise = sel1 (head (next_moves tree))
 
-
-maximumFromList :: [(Int,Position)] -> (Int,Position)
+-- |Sorts the list of evaluated moves, and returns the best one.
+maximumFromList :: [(Int,Position)] -- ^The list of evaluated moves.
+                                    -> (Int,Position) -- ^The best possible move.
 maximumFromList list = (last ((sortBy (comparing $ fst) list)))
 
-{-
-maximumFromList :: [(Int,Position)] -> (Int,Position)
-maximumFromList list | length list == 35 =  (last (shuffle (sortBy (comparing $ fst) list) [1]))
-                     | otherwise = last(sortBy (comparing $ fst) list)-}
-
--- Update the world state after some time has passed
-updateWorld :: Float -- ^ time since last update (you can ignore this)
-            -> World -- ^ current world state
-            -> IO World
+-- |Checks if the game has been won, if not then if it is the AIs turn then it makes a move.
+updateWorld :: Float -- ^ Time since last update.
+            -> World -- ^ Current world state.
+            -> IO World -- ^Returns the IO world, either unchanged, or with the move that the AI has made.
 updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = do return (World (board world) (turn world) (True) (Black) False)
             		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = do return (World (board world) (turn world) (True) (White) False)
             		    |(turn world) == White = do return (World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world) False)
             		    |otherwise = do return (world)
-
-
-{-updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = (World (board world) (turn world) (True) (Black))
-            		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = (World (board world) (turn world) (True) (White))
-            		    |otherwise = world-}
-
-
-{- Hint: 'updateWorld' is where the AI gets called. If the world state
- indicates that it is a computer player's turn, updateWorld should use
- 'getBestMove' to find where the computer player should play, and update
- the board in the world state with that move.
-
- In a complete implementation, 'updateWorld' should also check if either
- player has won and display a message if so.
--}
