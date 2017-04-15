@@ -80,7 +80,10 @@ maximumFromList list = (last ((sortBy (comparing $ fst) list)))
 updateWorld :: Float -- ^ Time since last update.
             -> World -- ^ Current world state.
             -> IO World -- ^Returns the IO world, either unchanged, or with the move that the AI has made.
-updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = do return (World (board world) (turn world) (True) (Black) False)
-            		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = do return (World (board world) (turn world) (True) (White) False)
-            		    |(turn world) == White = do return (World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world) False)
-            		    |otherwise = do return (world)
+updateWorld t world |length (pieces (board world)) > 4 && checkWon (board world) == Just Black = do return (World (board world) (turn world) (True) (Black) False False 10 False)
+            		    |length (pieces (board world)) > 4 && checkWon (board world) == Just White = do return (World (board world) (turn world) (True) (White) False False 10 False)
+            		    |(turn world) == White = do return (World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world) False (pause world) 10 (time world))
+                    |time world == True && pause world == True = do return (world)
+                    |time world == True && timer world < 0 = do return ((World (fromJust(makeMove (board world) (turn world) (getBestMove 1 (buildTree (gen) (board world) (turn world))))) (other (turn world)) (won world) (winner world) False (pause world) 10 (time world)))
+                    |time world == True = do return ((World (board world) (turn world) (won world) (winner world) (hint world) (pause world) ((timer world)-0.1) (time world)))
+                    |otherwise = do return (world)

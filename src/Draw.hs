@@ -40,7 +40,7 @@ printHintButton = Pictures[
 showHint :: World -- ^The current world.
 									-> Picture
 showHint world = Pictures [
-										Color violet (Translate (400) (155) (rectangleSolid 60 30)),
+										Color violet (Translate (403) (155) (rectangleSolid 65 34)),
 										Color white (Translate (377) (150) (Scale 0.15 0.15 (Text (show(getBestMoveForHint world)))))
 											]
 
@@ -72,6 +72,7 @@ printMostButtons w |hint w == True =  Pictures [
 																							printSaveButton,
 																							printLoadButton,
 																							printHintButton,
+																							printTimeButton w,
 																							showHint w
 																							]
 									|otherwise = Pictures [
@@ -84,8 +85,23 @@ printMostButtons w |hint w == True =  Pictures [
 																	printDecreaseLineButton,
 																	printSaveButton,
 																	printLoadButton,
+																	printTimeButton w,
 																	printHintButton
 																	]
+
+
+-- |Show the Picture for the play with timer button on the screen.
+printTimeButton :: World -> Picture
+printTimeButton w |(time w) == True =  Pictures [
+																										Color violet (Translate (403) (100) (rectangleSolid 65 34)),
+																										Color white (Translate (374) (93) (Scale 0.15 0.15 (Text "Timer!"))),
+																										printTimer w,
+																										printPauseButton
+																											]
+											|otherwise = Pictures [
+																			Color violet (Translate (403) (100) (rectangleSolid 65 34)),
+																			Color white (Translate (374) (93) (Scale 0.15 0.15 (Text "Timer!")))
+																				]
 
 -- |Print the Picture for the Restart Button.
 printRestartButton :: Picture
@@ -93,6 +109,21 @@ printRestartButton = Pictures [
 													Color violet (Translate (-95) (-370) (rectangleSolid 80 40)),
 													Color white (Translate (-128) (-375) (Scale 0.15 0.15 (Text "Restart!")))
 													]
+
+-- |Print the Picture for the Timer Button.
+printTimer :: World -- ^The current world.
+										-> Picture
+printTimer world = Pictures [
+													Color violet (Translate (43) (-370) (rectangleSolid 165 40)),
+													Color white (Translate (-35) (-375) (Scale 0.15 0.15 (Text ("Time: "++show(timer world)))))
+													]
+
+-- |Print the Picture for the Pause Button.
+printPauseButton :: Picture
+printPauseButton = Pictures [
+											Color violet (Translate (175) (-370) (rectangleSolid 70 40)),
+											Color white (Translate (147) (-375) (Scale 0.15 0.15 (Text "Pause!")))
+											]
 
 -- |Print the Picture for the Save Button.
 printSaveButton :: Picture

@@ -18,7 +18,7 @@ handleInput :: Event -- ^The event the player has made.
 handleInput (EventKey (MouseButton RightButton) Up m (x, y)) world | length (pieces (board world)) > 0 && (won world) == False = do return (undoMove world)
                                                                    | otherwise = do return (world)
 
-handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world |(won world) == False && (makeMove (board world) (turn world) ((convertToColumnMultiColumn x (board world)),(convertToColumnMultiRow y (board world)))) /= Nothing = do return (World (fromJust(makeMove (board world) (turn world) ((convertToColumnMultiColumn x (board world)),(convertToColumnMultiRow y (board world))))) (other (turn world)) (won world) (winner world) False)
+handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world |(won world) == False && ((time world == False) || ((time world == True) && (pause world == False))) && (makeMove (board world) (turn world) ((convertToColumnMultiColumn x (board world)),(convertToColumnMultiRow y (board world)))) /= Nothing = do return (World (fromJust(makeMove (board world) (turn world) ((convertToColumnMultiColumn x (board world)),(convertToColumnMultiRow y (board world))))) (other (turn world)) (won world) (winner world) False (pause world) 10 (time world))
                                                                   |(won world) == False && x<(-140) && x>(-260) && y<(-330) && y>(-410) && length (pieces (board world)) > 0 = do return (undoMove world)
                                                                   |x<(-15) && x>(-175) && y<(-330) && y>(-410) = do return (restartGame world)
                                                                   |(won world) == False && x<(-340) && x>(-460) && y<300 && y>240 = do return (increaseBoardSize world)
@@ -31,6 +31,10 @@ handleInput (EventKey (MouseButton LeftButton) Up m (x, y)) world |(won world) =
 																																	|(won world) == False && x<(-340) && x>(-460) && y>(-200) && y<(-100) = do
 																																																																					contents <- readFile "saveFile.txt"
 																																																																					return ((read(contents)))
-																																	|(won world) == False && x<(460) && x>(340) && y>(160) && y<(270) = do return (World (board world) (turn world) (won world) (winner world) True)
-                                                                  |otherwise = do return (world)
+																																	|(won world) == False && x<(460) && x>(340) && y>(160) && y<(270) = do return (World (board world) (turn world) (won world) (winner world) True (pause world) (timer world) (time world))
+																																	|(won world) == False && (time world) == False && x<(468) && x>(338) && y>(66) && y<(134) = do return (World (board world) (turn world) (won world) (winner world) (hint world) (pause world) 10 True)
+																																	|(won world) == False && (time world) == True && x<(468) && x>(338) && y>(66) && y<(134) = do return (World (board world) (turn world) (won world) (winner world) (hint world) (pause world) 10 False)
+																																	|(won world) == False && (pause world) == False && x<(245) && x>(105) && y>(-410) && y<(-330) = do return (World (board world) (turn world) (won world) (winner world) (hint world) True (timer world) (time world))
+																																	|(won world) == False && (pause world) == True && x<(245) && x>(105) && y>(-410) && y<(-330) = do return (World (board world) (turn world) (won world) (winner world) (hint world) False (timer world) (time world))
+																																	|otherwise = do return (world)
 handleInput e world =  do return (world)
