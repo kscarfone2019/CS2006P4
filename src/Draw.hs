@@ -73,6 +73,7 @@ printMostButtons w |hint w == True =  Pictures [
 																							printLoadButton,
 																							printHintButton,
 																							printTimeButton w,
+																							printBitmapButton,
 																							showHint w
 																							]
 									|otherwise = Pictures [
@@ -86,6 +87,7 @@ printMostButtons w |hint w == True =  Pictures [
 																	printSaveButton,
 																	printLoadButton,
 																	printTimeButton w,
+																	printBitmapButton,
 																	printHintButton
 																	]
 
@@ -102,6 +104,18 @@ printTimeButton w |(time w) == True =  Pictures [
 																			Color violet (Translate (403) (100) (rectangleSolid 65 34)),
 																			Color white (Translate (374) (93) (Scale 0.15 0.15 (Text "Timer!")))
 																				]
+
+
+
+
+-- |Show the Picture for the play with timer button on the screen.
+printBitmapButton :: Picture
+printBitmapButton =  Pictures [
+														Color violet (Translate (403) (15) (rectangleSolid 65 60)),
+														Color white (Translate (375) (18) (Scale 0.13 0.13 (Text "Bitmap"))),
+														Color white (Translate (372) (-2) (Scale 0.13 0.13 (Text "Pictures")))
+															]
+
 
 -- |Print the Picture for the Restart Button.
 printRestartButton :: Picture
@@ -196,22 +210,101 @@ printDecreaseLineButton = Pictures [
 -- |Print the Picture for all the of the squares on the Board.
 printBoard :: World -- ^The current world.
 										-> Picture -- ^The board Picture.
-printBoard w = Pictures [square x y (board w)| x <- reverse(generateXList (board w)), y <- (generateList (board w))]
+printBoard w = Pictures [square x y (board w) w| x <- reverse(generateXList (board w)), y <- (generateList (board w))]
 
 -- |Prints the Square and if there is a piece on the board, it prints that too.
 square :: Float -- ^The x coordinate for the square.
 								-> Float -- ^The y coordinate for the square.
 								-> Board -- ^The current board.
+								-> World -- ^The current world.
 								-> Picture -- ^The Picture of the square.
-square x y board |pieceHere ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == True && getColour ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == Black = Pictures[
+square x y board world |pics world == True && pieceHere ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == True && getColour ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == Black = Pictures[
+																																																																											(Translate x y  (Scale (getPictureSize board 1) (getPictureSize board 2) (squares world))),
+																																																																											(Translate x y  (Scale (sel1(getCounterSize board 1)) (sel2(getCounterSize board 1)) (counterOne world)))
+																																																																											--Color black (Translate x y (circleSolid (getCircleSize board)))
+																																																																											]
+								       |pics world == True && pieceHere ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == True && getColour ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == White = Pictures[
+			 																																																																											(Translate x y  (Scale (getPictureSize board 1) (getPictureSize board 2) (squares world))),
+																																																																														(Translate x y  (Scale (sel1(getCounterSize board 2)) (sel2(getCounterSize board 2)) (counterTwo world)))
+			 																																																																											--Color white (Translate x y (circleSolid (getCircleSize board )))
+			 																																																																											]
+											 |pics world == True = (Translate x y  (Scale (getPictureSize board 1) (getPictureSize board 2) (squares world)))
+											 |pieceHere ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == True && getColour ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == Black = Pictures[
 																																																																											Color blue (Translate x y (rectangleSolid (getSquareSize board) (getSquareSize board))),
 																																																																											Color black (Translate x y (circleSolid (getCircleSize board)))
 																																																																											]
-					       |pieceHere ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == True && getColour ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == White = Pictures[
- 																																																																											Color blue (Translate x y (rectangleSolid (getSquareSize board) (getSquareSize board))),
- 																																																																											Color white (Translate x y (circleSolid (getCircleSize board )))
- 																																																																											]
-					       |otherwise = Color blue (Translate x y  (rectangleSolid (getSquareSize board) (getSquareSize board)))
+								       |pieceHere ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == True && getColour ((convertToColumnMultiColumn x board), (convertToColumnMultiRow y board)) board == White = Pictures[
+			 																																																																											Color blue (Translate x y (rectangleSolid (getSquareSize board) (getSquareSize board))),
+			 																																																																											Color white (Translate x y (circleSolid (getCircleSize board )))
+			 																																																																											]
+								       |otherwise = Color blue (Translate x y  (rectangleSolid (getSquareSize board) (getSquareSize board)))
+
+-- |Getting the counter size via the size of the board.
+getCounterSize :: Board -- ^The current board.
+											-> Int -- ^Either 1 or 2 depending on which counter it is
+											-> (Float,Float) -- ^The size of an individual circle.
+getCounterSize board counter |counter == 1 && size board == 7 = (0.03,0.04)
+														 |counter == 1 && size board == 8 = (0.03,0.036)
+														 |counter == 1 && size board == 9 = (0.028,0.035)
+														 |counter == 1 && size board == 10 = (0.026,0.03)
+														 |counter == 1 && size board == 11 = (0.026,0.028)
+														 |counter == 1 && size board == 12 = (0.026,0.026)
+														 |counter == 1 && size board == 13 = (0.023,0.023)
+														 |counter == 1 && size board == 14 = (0.022,0.02)
+														 |counter == 1 && size board == 15 = (0.022,0.02)
+														 |counter == 1 && size board == 16 = (0.022,0.02)
+														 |counter == 1 && size board == 17 = (0.022,0.02)
+														 |counter == 1 && size board == 18 = (0.022,0.02)
+														 |counter == 1 && size board == 19 = (0.022,0.02)
+														 |counter == 1 = (0.04,0.05)
+														 |counter == 2 && size board == 7 = (0.09,0.09)
+														 |counter == 2 && size board == 8 = (0.08,0.07)
+													 	 |counter == 2 && size board == 9 = (0.08,0.07)
+														 |counter == 2 && size board == 10 = (0.073,0.066)
+														 |counter == 2 && size board == 11 = (0.073,0.065)
+														 |counter == 2 && size board == 12 = (0.065,0.06)
+														 |counter == 2 && size board == 13 = (0.06,0.052)
+														 |counter == 2 && size board == 14 = (0.05,0.04)
+														 |counter == 2 && size board == 15 = (0.05,0.04)
+														 |counter == 2 && size board == 16 = (0.05,0.04)
+														 |counter == 2 && size board == 17 = (0.05,0.04)
+														 |counter == 2 && size board == 18 = (0.05,0.04)
+														 |counter == 2 && size board == 19 = (0.05,0.04)
+														 |otherwise = (0.1,0.11)
+
+
+-- |Getting the square size via the size of the board.
+getPictureSize :: Board -- ^The current board.
+											-> Int -- ^Either 1 or 2 depending on x or y number
+											-> Float -- ^The size of an individual square.
+getPictureSize board digit |digit == 1 && size board == 7 = 0.06
+													|digit == 1 && size board == 8 = 0.053
+													|digit == 1 && size board == 9 = 0.048
+													|digit == 1 && size board == 10 = 0.043
+													|digit == 1 && size board == 11 = 0.04
+													|digit == 1 && size board == 12 = 0.038
+													|digit == 1 && size board == 13 = 0.03
+													|digit == 1 && size board == 14 = 0.028
+													|digit == 1 && size board == 15 = 0.028
+													|digit == 1 && size board == 16 = 0.028
+													|digit == 1 && size board == 17 = 0.028
+													|digit == 1 && size board == 18 = 0.028
+													|digit == 1 && size board == 19 = 0.028
+													|digit == 1 = 0.07
+													|digit == 2 && size board == 7 = 0.097
+													|digit == 2 && size board == 8 = 0.08
+													|digit == 2 && size board == 9 = 0.072
+													|digit == 2 && size board == 10 = 0.068
+													|digit == 2 && size board == 11 = 0.0625
+													|digit == 2 && size board == 12 = 0.06
+													|digit == 2 && size board == 13 = 0.05
+													|digit == 2 && size board == 14 = 0.042
+													|digit == 2 && size board == 15 = 0.042
+													|digit == 2 && size board == 16 = 0.042
+													|digit == 2 && size board == 17 = 0.042
+													|digit == 2 && size board == 18 = 0.042
+													|digit == 2 && size board == 19 = 0.042
+													|otherwise = 0.11
 
 -- |Getting the square size via the size of the board.
 getSquareSize :: Board -- ^The current board.

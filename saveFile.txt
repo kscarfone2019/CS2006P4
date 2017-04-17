@@ -1,1 +1,9 @@
-World {board = Board {size = 6, target = 3, pieces = [((6,5),White),((2,1),Black),((1,5),White),((1,2),Black),((4,2),White),((3,3),Black),((6,6),White),((2,4),Black)]}, turn = Black, won = False, winner = Empty}
+Board {size = 6, target = 3, pieces = [((4,1),White),((3,2),Black),((4,3),White),((3,3),Black),((6,6),White),((2,3),Black)]}
+Black
+False
+Empty
+False
+False
+10.0
+False
+False

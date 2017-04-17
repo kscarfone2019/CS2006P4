@@ -14,6 +14,13 @@
   (major1) == 1 && (major2) <  9 || \
   (major1) == 1 && (major2) == 9 && (minor) <= 2)
 
+/* package split-0.2.2 */
+#define VERSION_split "0.2.2"
+#define MIN_VERSION_split(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  2 || \
+  (major1) == 0 && (major2) == 2 && (minor) <= 2)
+
 /* package tuple-0.3.0.2 */
 #define VERSION_tuple "0.3.0.2"
 #define MIN_VERSION_tuple(major1,major2,minor) (\

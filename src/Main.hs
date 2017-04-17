@@ -27,10 +27,13 @@ import AI
 main :: IO ()
 main = do
   args <- getArgs
+  squaresPicture <- loadBMP "flowers.bmp"
+  countersOne <- loadBMP "bee.bmp"
+  countersTwo <- loadBMP "ladybug.bmp"
   let initBoard = if length args > 1 && ((read (head (tail args)) ::Int )== 3 || (read (head (tail args)) ::Int) == 5) && ((read (head args) ::Int)>5 && (read (head args) ::Int)<20)
                   then Board (read (head args) ::Int) (read (head (tail args)) ::Int) []
                   else Board 6 3 []
-  let initWorld = World initBoard Black False Empty False False 10 False
+  let initWorld = World initBoard Black False Empty False False 10 False False squaresPicture countersOne countersTwo
   playIO (InWindow "Gomoku" (900, 900) (10, 10)) black 10
             initWorld -- in Board.hs
             drawWorld -- in Draw.hs

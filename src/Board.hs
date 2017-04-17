@@ -4,6 +4,7 @@ module Board where
 import Data.Tuple.Select
 import Debug.Trace
 import Data.Maybe
+import Graphics.Gloss.Interface.IO.Game
 
 -- |Data type representing the 'turn'.
 data Col = Black | White | Empty
@@ -24,6 +25,7 @@ data Board = Board { size :: Int, -- ^ The size of the board.
                    }
   deriving (Show, Eq, Read)
 
+-- |The initial Board used to reset the game to defaults.
 initBoard = Board 6 3 []
 
 -- |Overall state is the board and whose turn it is, plus any further information about the world.
@@ -34,8 +36,17 @@ data World = World { board :: Board, -- ^The board of the game.
                      hint :: Bool,
                      pause :: Bool,
                      timer :: Float,
-                     time :: Bool} -- ^If a hint has been asked for.
-    deriving(Show, Read)
+                     time :: Bool,
+                     pics :: Bool,
+                     squares :: Picture,
+                     counterOne :: Picture,
+                     counterTwo :: Picture} -- ^If a hint has been asked for.
+  --  deriving(Show)
+
+-- |Making a custom show function for the World Data type
+instance Show World where
+  show (World board turn won winner hint pause timer time pics squares counterOne counterTwo) = show(board) ++ "\n" ++ show(turn) ++ "\n" ++ show(won) ++ "\n" ++ show(winner) ++ "\n" ++ show(hint) ++ "\n" ++ show(pause) ++ "\n" ++ show(timer) ++ "\n" ++ show(time) ++ "\n" ++ show(pics)
+
 
 -- |Play a move on the board; return 'Nothing' if the move is invalid (e.g. outside the range of the board, or there is a piece already there).
 makeMove :: Board -- ^The current Board.
@@ -48,30 +59,37 @@ makeMove board col pos |checkPositionForPiece pos board == False && checkPositio
 -- |Restart and reset the game to its default settings.
 restartGame :: World -- ^The current World.
                       -> World -- ^The newly reset world.
-restartGame world = (World initBoard Black False Empty False False 10 False)
+restartGame world = (World initBoard Black False Empty False False 10 False (pics world) (squares world) (counterOne world) (counterTwo world))
+
+-- |Swap the picture being displayed on the screen between bitmap images and simple gloss images.
+changeImage :: World -- ^The current world
+                    -> World -- ^The new updted world
+changeImage world |pics world == False = (World (board world) (turn world) (won world) (winner world) (hint world) (pause world) (timer world) (time world) (True) (squares world) (counterOne world) (counterTwo world))
+                  |otherwise = (World (board world) (turn world) (won world) (winner world) (hint world) (pause world) (timer world) (time world) (False) (squares world) (counterOne world) (counterTwo world))
+
 
 -- |Incearse the number of squares on the game board.
 increaseBoardSize :: World -- ^The current World.
                           -> World -- ^The newly increased size world.
-increaseBoardSize world |size (board world)< 19 = (World (Board (size (board world)+1) (target (board world)) []) Black False Empty False False 10 False)
+increaseBoardSize world |size (board world)< 19 = (World (Board (size (board world)+1) (target (board world)) []) Black False Empty False False 10 False (pics world) (squares world) (counterOne world) (counterTwo world))
                         |otherwise = world
 
 -- |Decrease the number of squares on the game board.
 decreaseBoardSize :: World -- ^The current World.
                           -> World -- ^The newly decreased size world.
-decreaseBoardSize world |size (board world)> 6 = (World (Board (size (board world)-1) (target (board world)) []) Black False Empty False False 10 False)
+decreaseBoardSize world |size (board world)> 6 = (World (Board (size (board world)-1) (target (board world)) []) Black False Empty False False 10 False (pics world) (squares world) (counterOne world) (counterTwo world))
                         |otherwise = world
 
 -- |Increase the target line length to get to win the game, onlt if the curretn line length is '3'.
 increaseLineSize :: World -- ^The current World.
                           -> World -- ^The newly increased target world.
-increaseLineSize world |target (board world) == 3 = (World (Board (size (board world)) (5) []) Black False Empty False False 10 False)
+increaseLineSize world |target (board world) == 3 = (World (Board (size (board world)) (5) []) Black False Empty False False 10 False (pics world) (squares world) (counterOne world) (counterTwo world))
                        |otherwise = world
 
 -- |Decrease the target line length to get to win the game, onlt if the curretn line length is '5'.
 decreaseLineSize :: World -- ^The current World.
                           -> World -- ^The newly decreased target world.
-decreaseLineSize world |target (board world) == 5 = (World (Board (size (board world)) (3) []) Black False Empty False False 10 False)
+decreaseLineSize world |target (board world) == 5 = (World (Board (size (board world)) (3) []) Black False Empty False False 10 False (pics world) (squares world) (counterOne world) (counterTwo world))
                        |otherwise = world
 
 -- |Undo the players last move, this also undos the AI's most recent move.
@@ -79,7 +97,7 @@ undoMove :: World -- ^The current World.
                     -> World -- ^The world without the most two most recent moves.
 undoMove world = do
         let newBoard =  (Board (size (board world)) (target (board world)) (tail(tail(pieces (board world)))))
-        World (newBoard) (turn world) (won world) (winner world) False False 10 False
+        World (newBoard) (turn world) (won world) (winner world) False False 10 False (pics world) (squares world) (counterOne world) (counterTwo world)
 
 -- |Checks if a position is a valid position on the board.
 checkPositionOnBoard :: Board -- ^The game Board.
